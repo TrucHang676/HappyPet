@@ -1,0 +1,13 @@
+# Bỏ qua thư viện nặng
+node_modules
+
+# Bỏ qua file chứa mật khẩu/key (QUAN TRỌNG)
+.env
+
+# Bỏ qua file upload của người dùng (Thấy bạn có folder uploads)
+uploads/
+
+# Bỏ qua log hệ thống
+npm-debug.log*
+logs/
+*.log

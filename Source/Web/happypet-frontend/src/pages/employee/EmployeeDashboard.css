@@ -1,0 +1,410 @@
+/* ================== DASHBOARD LAYOUT ================== */
+.dashboard-container {
+    padding: 30px;
+    background-color: #f4f6f8; /* Nền xám nhẹ làm nổi bật các thẻ trắng */
+    min-height: 100vh;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+}
+
+.dashboard-title {
+    color: #2c3e50;
+    font-weight: 800;
+    margin-bottom: 5px;
+    font-size: 1.8rem;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.dashboard-subtitle {
+    color: #7f8c8d;
+    margin-bottom: 25px;
+    font-size: 0.95rem;
+}
+
+/* ================== TABS THỜI GIAN (STYLE MỚI) ================== */
+.tabs-container {
+    display: flex;
+    gap: 15px;
+    margin-bottom: 25px;
+    background: #fff;
+    padding: 10px;
+    border-radius: 12px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.03);
+    width: fit-content;
+}
+
+/* Tìm và sửa đoạn này trong EmployeeDashboard.css */
+.tab-btn {
+    padding: 10px 25px;
+    border: none;
+    background: transparent;
+    color: #666;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+    font-size: 0.95rem;
+    
+    /* --- THÊM 2 DÒNG NÀY --- */
+    white-space: nowrap;  /* Bắt buộc chữ nằm trên 1 dòng */
+    min-width: 140px;     /* Kéo dài nút ra tối thiểu 140px cho rộng rãi */
+    justify-content: center; /* Căn giữa nội dung trong nút */
+}
+
+.tab-btn:hover {
+    background: #fff5eb; /* Màu cam rất nhạt khi hover */
+    color: #d7852b;
+}
+
+/* Tab đang chọn -> Màu cam chủ đạo */
+.tab-btn.active {
+    background: #d7852b;
+    color: white;
+    box-shadow: 0 4px 10px rgba(215, 133, 43, 0.4);
+}
+
+/* ================== FILTER TRẠNG THÁI (STYLE PILL) ================== */
+.tab-sub-filter {
+    display: flex;
+    gap: 12px;
+    margin-bottom: 20px;
+    flex-wrap: wrap;
+}
+
+.filter-pill {
+    padding: 8px 16px;
+    border-radius: 50px; /* Bo tròn như viên thuốc */
+    font-size: 0.9rem;
+    cursor: pointer;
+    border: 1px solid #e0e0e0;
+    background: white;
+    color: #555;
+    transition: all 0.2s;
+    font-weight: 500;
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.filter-pill:hover {
+    border-color: #d7852b;
+    color: #d7852b;
+}
+
+.filter-pill.active {
+    background: #34495e; /* Màu tối sang trọng cho filter phụ */
+    color: white;
+    border-color: #34495e;
+    box-shadow: 0 4px 10px rgba(52, 73, 94, 0.3);
+}
+
+.badge-count {
+    background: rgba(255, 255, 255, 0.2);
+    color: inherit;
+    font-size: 0.75rem;
+    padding: 2px 8px;
+    border-radius: 10px;
+}
+
+.filter-pill.active .badge-count {
+    background: rgba(255, 255, 255, 0.3);
+    color: white;
+}
+
+/* ================== TABLE CARD STYLE ================== */
+.table-card {
+    background: white;
+    border-radius: 16px;
+    box-shadow: 0 5px 20px rgba(0,0,0,0.05);
+    overflow: hidden; /* Để bo góc bảng không bị lòi ra */
+    padding: 5px;
+}
+
+.booking-table {
+    width: 100%;
+    border-collapse: separate; /* Để tách dòng nếu cần */
+    border-spacing: 0;
+}
+
+.booking-table thead th {
+    background-color: #f8f9fa;
+    color: #444;
+    font-weight: 700;
+    padding: 18px 15px;
+    text-align: left;
+    border-bottom: 2px solid #eee;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    letter-spacing: 0.5px;
+}
+
+.booking-table tbody tr {
+    transition: background-color 0.2s;
+}
+
+.booking-table tbody tr:hover {
+    background-color: #fffbf5; /* Hover màu cam siêu nhạt */
+}
+
+.booking-table td {
+    padding: 16px 15px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #333;
+    font-size: 0.95rem;
+    vertical-align: middle;
+}
+
+/* ================== STATUS BADGES (ĐẸP HƠN) ================== */
+.status-badge {
+    padding: 6px 12px;
+    border-radius: 6px;
+    font-size: 0.85rem;
+    font-weight: 700;
+    display: inline-block;
+}
+
+.status-waiting { background-color: #e3f2fd; color: #1976d2; } /* Xanh dương nhạt */
+.status-shipping { background-color: #fff3e0; color: #ef6c00; } /* Cam nhạt */
+.status-done { background-color: #e8f5e9; color: #2e7d32; } /* Xanh lá nhạt */
+.status-cancel { background-color: #ffebee; color: #c62828; } /* Đỏ nhạt */
+
+/* ================== BUTTONS ================== */
+.btn-check-in {
+    background-color: #d7852b; /* Màu cam HappyPet */
+    color: white;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+    font-size: 0.9rem;
+    box-shadow: 0 3px 8px rgba(215, 133, 43, 0.3);
+    transition: all 0.2s;
+}
+
+.btn-check-in:hover {
+    background-color: #bf7320;
+    transform: translateY(-2px);
+    box-shadow: 0 5px 12px rgba(215, 133, 43, 0.4);
+}
+
+.text-muted {
+    font-size: 0.85rem;
+    color: #888;
+}
+
+/* ================== MODAL STYLES (MỚI THÊM) ================== */
+.modal-overlay {
+    position: fixed;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background-color: rgba(0, 0, 0, 0.5); /* Nền tối mờ */
+    display: flex;
+    justify-content: center;
+    align-items: center;
+    z-index: 1000;
+    backdrop-filter: blur(2px); /* Làm mờ nền sau lưng */
+}
+
+.modal-content {
+    background: white;
+    padding: 25px;
+    border-radius: 16px;
+    width: 400px;
+    box-shadow: 0 10px 30px rgba(0,0,0,0.2);
+    animation: slideDown 0.3s ease-out;
+}
+
+@keyframes slideDown {
+    from { transform: translateY(-20px); opacity: 0; }
+    to { transform: translateY(0); opacity: 1; }
+}
+
+.modal-content h3 {
+    margin-top: 0;
+    color: #2c3e50;
+    margin-bottom: 20px;
+    font-size: 1.3rem;
+    border-bottom: 1px solid #eee;
+    padding-bottom: 10px;
+}
+
+.form-select-custom {
+    width: 100%;
+    padding: 10px 15px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+    margin-bottom: 20px;
+    font-size: 1rem;
+    outline: none;
+    transition: border 0.3s;
+}
+
+.form-select-custom:focus {
+    border-color: #d7852b;
+}
+
+.modal-actions {
+    display: flex;
+    gap: 10px;
+    justify-content: flex-end;
+}
+
+.btn-cancel {
+    background: #f1f2f6;
+    color: #555;
+    border: none;
+    padding: 8px 16px;
+    border-radius: 8px;
+    cursor: pointer;
+    font-weight: 600;
+}
+.btn-cancel:hover { background: #e0e0e0; }
+
+/* ================== MODAL CHI TIẾT ĐƠN HÀNG (MODERN STYLE) ================== */
+
+/* Header của Modal */
+.modal-header-modern {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding-bottom: 20px;
+    border-bottom: 1px solid #eee;
+    margin-bottom: 20px;
+}
+
+.modal-title {
+    font-size: 1.4rem;
+    font-weight: 800;
+    color: #2c3e50;
+    display: flex;
+    align-items: center;
+    gap: 10px;
+}
+
+.modal-close-btn {
+    background: transparent;
+    border: none;
+    font-size: 1.5rem;
+    color: #95a5a6;
+    cursor: pointer;
+    transition: all 0.2s;
+    width: 36px;
+    height: 36px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.modal-close-btn:hover {
+    background-color: #f1f2f6;
+    color: #e74c3c;
+    transform: rotate(90deg);
+}
+
+/* Phần thông tin khách hàng (Chia cột) */
+.order-info-section {
+    display: grid;
+    grid-template-columns: 1fr 1fr; /* Chia 2 cột */
+    gap: 20px;
+    background-color: #fff8f0; /* Nền cam siêu nhạt */
+    padding: 20px;
+    border-radius: 12px;
+    margin-bottom: 25px;
+    border: 1px dashed #d7852b;
+}
+
+.info-group {
+    display: flex;
+    flex-direction: column;
+    gap: 5px;
+}
+
+.info-label {
+    font-size: 0.85rem;
+    text-transform: uppercase;
+    color: #888;
+    font-weight: 600;
+    letter-spacing: 0.5px;
+}
+
+.info-value {
+    font-size: 1rem;
+    color: #333;
+    font-weight: 500;
+}
+
+/* Bảng chi tiết sản phẩm đẹp hơn */
+.detail-table {
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 10px;
+}
+
+.detail-table th {
+    text-align: left;
+    padding: 12px;
+    background-color: #f8f9fa;
+    color: #666;
+    font-size: 0.9rem;
+    border-bottom: 2px solid #eee;
+}
+
+.detail-table td {
+    padding: 15px 12px;
+    border-bottom: 1px solid #f1f1f1;
+    color: #333;
+    vertical-align: middle;
+}
+
+.item-name {
+    font-weight: 600;
+    color: #2c3e50;
+    margin-bottom: 3px;
+}
+
+.item-code {
+    font-size: 0.8rem;
+    color: #95a5a6;
+    background: #f1f2f6;
+    padding: 2px 6px;
+    border-radius: 4px;
+    display: inline-block;
+}
+
+/* Dòng tổng tiền */
+.total-section {
+    display: flex;
+    justify-content: flex-end;
+    align-items: center;
+    padding-top: 20px;
+    margin-top: 10px;
+    border-top: 2px solid #eee;
+    gap: 15px;
+}
+
+.total-label {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #555;
+}
+
+.total-price {
+    font-size: 1.5rem;
+    font-weight: 800;
+    color: #d7852b; /* Màu cam HappyPet */
+}
+
+/* Hiệu ứng loading đẹp hơn */
+.loading-box {
+    padding: 40px;
+    text-align: center;
+    color: #999;
+    font-style: italic;
+    background: #fafafa;
+    border-radius: 8px;
+}

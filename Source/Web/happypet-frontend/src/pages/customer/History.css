@@ -1,0 +1,197 @@
+
+/* Badge styles */
+.history-page {
+    max-width: 800px;
+    margin: 30px auto;
+    padding: 20px;
+    font-family: 'Segoe UI', sans-serif;
+}
+
+.title { text-align: center; color: #444; margin-bottom: 30px; }
+
+/* STYLE GIỐNG BOOKING */
+.order-card-booking-style {
+    background: #fff;
+    border-radius: 8px;
+    box-shadow: 0 2px 8px rgba(0,0,0,0.08);
+    margin-bottom: 20px;
+    overflow: hidden;
+    transition: transform 0.2s;
+}
+
+.order-card-booking-style:hover {
+    transform: translateY(-2px);
+}
+
+.card-left-border {
+    border-left: 6px solid #ccc; /* Màu mặc định, sẽ bị override bởi inline-style */
+    padding: 15px 20px;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-content { flex: 1; }
+
+.card-title-row {
+    font-size: 16px;
+    font-weight: bold;
+    color: #333;
+    margin-bottom: 8px;
+    cursor: pointer;
+}
+
+.order-date { font-weight: normal; color: #777; font-size: 0.9em; }
+
+.card-info-row {
+    font-size: 14px;
+    color: #555;
+    margin-bottom: 5px;
+}
+
+.status-line {
+    font-weight: 600;
+    font-size: 14px;
+    margin-bottom: 8px;
+}
+.text-success { color: #27ae60; }
+.text-warning { color: #f39c12; }
+.text-danger { color: #c0392b; }
+.text-secondary { color: #7f8c8d; }
+
+.card-money-row {
+    font-size: 15px;
+    color: #2c3e50;
+    margin-top: 5px;
+}
+.card-money-row b { color: #e74c3c; font-size: 1.1em; }
+
+.card-toggle-btn {
+    font-size: 12px;
+    color: #3498db;
+    cursor: pointer;
+    font-weight: bold;
+    padding: 5px;
+}
+
+/* PHẦN CHI TIẾT (Xổ xuống) */
+.order-detail-box {
+    background: #fafafa;
+    border-top: 1px dashed #eee;
+    padding: 15px 20px;
+    animation: slideDown 0.3s ease;
+}
+
+/* CHỈNH LẠI BẢNG CHI TIẾT */
+.detail-table { 
+    width: 100%; 
+    border-collapse: collapse; 
+    margin-bottom: 10px; 
+    table-layout: fixed; /* Cố định layout để chia cột đều */
+}
+
+/* Header của bảng */
+.detail-table th { 
+    color: #888; 
+    padding: 8px 0; 
+    border-bottom: 1px solid #ddd; 
+    font-size: 13px;
+    font-weight: 600;
+}
+
+.detail-table td { 
+    padding: 12px 0; 
+    border-bottom: 1px solid #eee; 
+    font-size: 14px; 
+    vertical-align: middle;
+}
+
+/* ✅ CANH CỘT CHO THẲNG */
+/* Cột 1: Sản phẩm (Rộng nhất, canh trái) */
+.detail-table th:nth-child(1), 
+.detail-table td:nth-child(1) {
+    width: 50%;
+    text-align: left;
+}
+
+/* Cột 2: SL (Nhỏ, canh giữa) */
+.detail-table th:nth-child(2), 
+.detail-table td:nth-child(2) {
+    width: 10%;
+    text-align: center;
+}
+
+/* Cột 3: Giá (Vừa, canh phải) */
+.detail-table th:nth-child(3), 
+.detail-table td:nth-child(3) {
+    width: 20%;
+    text-align: right;
+    padding-right: 15px; /* Thụt vào tí cho đẹp */
+}
+
+/* Cột 4: Thành tiền (Vừa, canh phải, đậm) */
+.detail-table th:nth-child(4), 
+.detail-table td:nth-child(4) {
+    width: 20%;
+    text-align: right;
+    font-weight: bold;
+    color: #333;
+}
+
+.product-cell { display: flex; align-items: center; gap: 10px; }
+.product-cell img { width: 35px; height: 35px; object-fit: cover; border-radius: 4px; border: 1px solid #ddd; }
+
+.detail-footer {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-top: 10px;
+    font-size: 14px;
+    font-weight: bold;
+    color: #555;
+}
+
+.btn-cancel-mini {
+    background: #fff;
+    border: 1px solid #c0392b;
+    color: #c0392b;
+    padding: 4px 10px;
+    border-radius: 4px;
+    cursor: pointer;
+    font-size: 12px;
+}
+.btn-cancel-mini:hover { background: #c0392b; color: #fff; }
+
+@keyframes slideDown {
+    from { opacity: 0; transform: translateY(-10px); }
+    to { opacity: 1; transform: translateY(0); }
+}
+
+.tab-item { padding: 8px 15px; border: none; background: none; cursor: pointer; color: #666; font-weight: 500; }
+.tab-active { padding: 8px 15px; border: none; background: none; cursor: pointer; color: #3498db; font-weight: bold; border-bottom: 2px solid #3498db; }
+.tab-item:hover { color: #3498db; }
+
+/* Khung bao ngoài cùng */
+.history-container-card {
+    background: #fff;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.05);
+}
+
+/* Kiểu chữ tiêu đề giống bên Booking */
+.history-page .title {
+    color: #2c3e50;
+    font-weight: 700;
+    font-size: 24px;
+}
+
+/* Style cho các Tab cho chuyên nghiệp */
+.tab-item {
+    color: #7f8c8d;
+    transition: all 0.3s;
+}
+
+.tab-active {
+    color: #3498db;
+    border-bottom: 3px solid #3498db !important;
+}

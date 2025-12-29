@@ -1,0 +1,75 @@
+.booking-container {
+    max-width: 600px;
+    margin: 40px auto;
+    padding: 30px;
+    background: #fff;
+    border-radius: 10px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+}
+
+.booking-title {
+    text-align: center;
+    color: #1565c0;
+    margin-bottom: 25px;
+}
+
+.booking-form {
+    display: flex;
+    flex-direction: column;
+    gap: 15px;
+}
+
+.form-group label {
+    font-weight: 600;
+    margin-bottom: 5px;
+    display: block;
+    color: #333;
+}
+
+.input-field {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ddd;
+    border-radius: 5px;
+    font-size: 16px;
+    box-sizing: border-box;
+}
+
+.input-field:focus {
+    border-color: #1565c0;
+    outline: none;
+}
+
+.form-row {
+    display: flex;
+    gap: 20px;
+}
+
+.form-row .form-group {
+    flex: 1;
+}
+
+.btn-submit {
+    margin-top: 10px;
+    padding: 12px;
+    background: #ff6f00; /* Màu cam nổi bật */
+    color: white;
+    border: none;
+    border-radius: 5px;
+    font-size: 18px;
+    font-weight: bold;
+    cursor: pointer;
+    transition: background 0.3s;
+}
+
+.btn-submit:hover {
+    background: #e65100;
+}
+
+.btn-submit:disabled {
+    background: #ccc;
+    cursor: not-allowed;
+}
+
+.tab-item { padding: 10px 20px; border: none; background: none; cursor: pointer; color: #777; font-weight: bold; }
+.tab-active { padding: 10px 20px; border: none; background: none; cursor: pointer; color: #d35400; font-weight: bold; border-bottom: 3px solid #d35400; }

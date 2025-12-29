@@ -1,0 +1,370 @@
+/* ================== GLOBAL RESET & TYPOGRAPHY ================== */
+* {
+    box-sizing: border-box;
+}
+
+.products-page-wrapper {
+    font-family: 'Segoe UI', 'Roboto', Helvetica, Arial, sans-serif;
+    color: #444;
+    background-color: #f5f7fa; /* Màu nền xám sáng, sạch hơn */
+    padding-bottom: 40px;
+    width: 100%;
+    overflow-x: hidden;
+}
+
+/* ================== 1. BANNER SECTION (Đã thu nhỏ lại) ================== */
+.banner-section {
+    background-image: url('https://images.unsplash.com/photo-1450778869180-41d0601e046e?q=80&w=1972&auto=format&fit=crop');
+    background-size: cover;
+    /* Căn chỉnh lại để thấy rõ mặt chó mèo trong khung nhỏ hơn */
+    background-position: center 35%; 
+    height: 240px; /* Chiều cao giảm từ 320px xuống 240px */
+    display: flex;
+    align-items: center;
+    justify-content: center; /* Căn giữa nội dung */
+    position: relative;
+    margin-bottom: 0;
+}
+
+.banner-section::before {
+    content: '';
+    position: absolute;
+    top: 0; left: 0; right: 0; bottom: 0;
+    background: rgba(0,0,0,0.3); /* Phủ tối đều để làm nổi bật chữ */
+}
+
+.banner-content {
+    position: relative;
+    z-index: 2;
+    color: #fff;
+    text-align: center; /* Canh giữa chữ */
+}
+
+.banner-content h1 {
+    font-size: 2.2rem; /* Giảm cỡ chữ tiêu đề */
+    font-weight: 800;
+    margin-bottom: 8px;
+    text-shadow: 0 2px 5px rgba(0,0,0,0.4);
+}
+
+.banner-content p {
+    font-size: 1.1rem; /* Giảm cỡ chữ mô tả */
+    margin-bottom: 20px;
+    font-weight: 500;
+    opacity: 0.95;
+}
+
+.shop-now-btn {
+    padding: 10px 30px; /* Nút nhỏ lại xíu */
+    background-color: #d7852b;
+    color: white;
+    border: none;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    box-shadow: 0 4px 10px rgba(215, 133, 43, 0.3);
+}
+
+.shop-now-btn:hover {
+    background-color: #e68a30;
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(215, 133, 43, 0.5);
+}
+
+/* ================== 2. DANH MỤC TRÒN (Thu nhỏ và gọn hơn) ================== */
+.category-quick-nav {
+    display: flex;
+    justify-content: center;
+    gap: 40px; /* Giảm khoảng cách giữa các mục */
+    padding: 30px 0; /* Giảm padding trên dưới */
+    background-color: #fff;
+    margin-bottom: 30px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.05);
+}
+
+.cat-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    cursor: pointer;
+    transition: transform 0.3s ease;
+}
+
+.cat-item:hover {
+    transform: translateY(-3px);
+}
+
+.cat-circle {
+    width: 65px; /* Giảm kích thước vòng tròn */
+    height: 65px;
+    background-color: #fff9f2;
+    border: 2px solid #fff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 26px; /* Giảm cỡ icon */
+    margin-bottom: 10px;
+    color: #d7852b;
+    box-shadow: 0 3px 8px rgba(0,0,0,0.06);
+    transition: all 0.3s ease;
+}
+
+.cat-item:hover .cat-circle {
+    background-color: #d7852b;
+    color: #fff;
+    box-shadow: 0 5px 15px rgba(215, 133, 43, 0.3);
+}
+
+.cat-item span {
+    font-weight: 600;
+    color: #666;
+    font-size: 0.9rem;
+}
+
+/* ================== 3. LAYOUT CONTAINER (Căn chỉnh lại khổ) ================== */
+.shop-container {
+    display: flex;
+    max-width: 1080px; /* Giảm chiều rộng tổng thể để vừa mắt hơn trên laptop */
+    margin: 0 auto;
+    padding: 0 20px;
+    gap: 30px; /* Giảm khoảng cách giữa sidebar và content */
+    align-items: flex-start;
+}
+
+/* --- SIDEBAR (Nhỏ gọn hơn) --- */
+.shop-sidebar {
+    flex: 0 0 230px; /* Giảm chiều rộng sidebar */
+    background: #fff;
+    padding: 20px;
+    border-radius: 10px;
+    box-shadow: 0 2px 10px rgba(0,0,0,0.04);
+    position: sticky;
+    top: 20px;
+}
+
+.filter-group { margin-bottom: 25px; }
+
+.filter-group h3 {
+    font-size: 1rem;
+    margin-bottom: 12px;
+    color: #333;
+    font-weight: 700;
+    border-left: 3px solid #d7852b;
+    padding-left: 8px;
+}
+
+.filter-group ul { list-style: none; padding: 0; }
+.filter-group li { margin-bottom: 10px; }
+
+.filter-group label {
+    cursor: pointer;
+    display: flex;
+    align-items: center;
+    color: #666;
+    font-size: 0.9rem;
+    transition: color 0.2s;
+}
+.filter-group label:hover { color: #d7852b; }
+
+.filter-group input[type="checkbox"] {
+    margin-right: 10px;
+    width: 15px; height: 15px;
+    accent-color: #d7852b;
+    cursor: pointer;
+}
+
+.price-range { width: 100%; cursor: pointer; accent-color: #d7852b; }
+
+/* --- CONTENT --- */
+.shop-content {
+    flex: 1;
+}
+
+.shop-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 12px;
+    border-bottom: 1px solid #eee;
+}
+
+.shop-header h2 {
+    font-size: 1.3rem; /* Giảm cỡ chữ tiêu đề mục */
+    font-weight: 700;
+    color: #333;
+    margin: 0;
+}
+
+.search-bar-mini {
+    display: flex;
+    border: 1px solid #e1e1e1;
+    border-radius: 50px;
+    background: #fff;
+    padding: 3px 4px 3px 15px; /* Gọn hơn */
+    transition: box-shadow 0.3s;
+}
+.search-bar-mini:focus-within {
+    box-shadow: 0 0 0 2px rgba(215, 133, 43, 0.1);
+    border-color: #d7852b;
+}
+
+.search-bar-mini input {
+    border: none;
+    outline: none;
+    font-size: 0.9rem;
+    width: 180px; /* Ô nhập liệu ngắn lại chút */
+}
+.search-bar-mini button {
+    border: none;
+    background: #d7852b;
+    color: white;
+    width: 32px; height: 32px; /* Nút search nhỏ lại */
+    border-radius: 50%;
+    cursor: pointer;
+    display: flex; align-items: center; justify-content: center;
+    font-size: 0.9rem;
+}
+
+/* ================== 4. GRID & PRODUCT CARDS (Làm nhỏ thẻ sản phẩm) ================== */
+.product-grid-new {
+    display: grid;
+    /* Quan trọng: Giảm kích thước tối thiểu xuống 190px để thẻ nhỏ lại */
+    grid-template-columns: repeat(auto-fill, minmax(190px, 1fr));
+    gap: 20px; /* Khoảng cách giữa các thẻ gần hơn */
+}
+
+.product-card-new {
+    background-color: #fff;
+    border-radius: 12px; /* Bo góc ít hơn cho thẻ nhỏ */
+    overflow: hidden;
+    transition: all 0.3s cubic-bezier(0.25, 0.8, 0.25, 1);
+    border: 1px solid transparent;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.03); /* Bóng mờ nhẹ hơn */
+}
+
+.product-card-new:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.08);
+    border-color: #eee;
+}
+
+.card-img-wrapper {
+    position: relative;
+    width: 100%;
+    padding-top: 100%;
+    background-color: #fff;
+    overflow: hidden;
+    border-bottom: 1px solid #f5f5f5;
+}
+
+.card-img-wrapper img {
+    position: absolute;
+    top: 50%; left: 50%;
+    transform: translate(-50%, -50%);
+    max-width: 80%; /* Ảnh sản phẩm nhỏ lại một chút trong khung */
+    max-height: 80%;
+    object-fit: contain;
+    transition: transform 0.5s ease;
+}
+
+.product-card-new:hover .card-img-wrapper img {
+    transform: translate(-50%, -50%) scale(1.08);
+}
+
+.badge {
+    position: absolute;
+    top: 10px; left: 10px;
+    padding: 4px 10px; /* Badge nhỏ lại */
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 700;
+    color: #fff;
+    z-index: 5;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.1);
+}
+.badge-out { background-color: #ff4757; }
+
+.card-body {
+    padding: 15px; /* Giảm padding trong thẻ */
+    display: flex;
+    flex-direction: column;
+    flex-grow: 1;
+}
+
+.card-category {
+    font-size: 0.75rem;
+    color: #999;
+    font-weight: 600;
+    text-transform: uppercase;
+    margin-bottom: 6px;
+    letter-spacing: 0.5px;
+}
+
+.card-title {
+    font-size: 0.95rem; /* Tên sản phẩm nhỏ lại */
+    font-weight: 600;
+    color: #333;
+    margin: 0 0 8px 0;
+    line-height: 1.3;
+    height: 2.6em;
+    overflow: hidden;
+    display: -webkit-box;
+    -webkit-line-clamp: 2;
+    -webkit-box-orient: vertical;
+}
+
+.card-rating { margin-bottom: 12px; font-size: 0.85rem; }
+.rating-count { color: #ccc; font-size: 0.75rem; }
+
+.card-bottom {
+    margin-top: auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.card-price {
+    font-size: 1.1rem; /* Giá tiền nhỏ lại cho cân đối */
+    font-weight: 700;
+    color: #d7852b;
+}
+
+.btn-add-cart-mini {
+    width: 36px; height: 36px; /* Nút thêm giỏ hàng nhỏ lại */
+    border-radius: 10px;
+    background-color: #f0f2f5;
+    border: none;
+    color: #333;
+    font-size: 1.1rem;
+    display: flex; align-items: center; justify-content: center;
+    cursor: pointer;
+    transition: all 0.2s;
+}
+
+.btn-add-cart-mini:hover:not(:disabled) {
+    background-color: #d7852b;
+    color: #fff;
+    box-shadow: 0 3px 8px rgba(215, 133, 43, 0.3);
+}
+.btn-add-cart-mini:disabled { opacity: 0.5; cursor: not-allowed; }
+
+/* ================== RESPONSIVE ================== */
+@media (max-width: 1200px) {
+    .shop-container { max-width: 960px; gap: 20px; }
+    .product-grid-new { grid-template-columns: repeat(auto-fill, minmax(170px, 1fr)); } /* Thẻ nhỏ hơn nữa trên màn hình hẹp */
+    .cat-circle { width: 60px; height: 60px; font-size: 24px; }
+}
+
+@media (max-width: 992px) {
+    .shop-container { flex-direction: column; }
+    .shop-sidebar { width: 100%; margin-bottom: 20px; position: static; }
+    .banner-content h1 { font-size: 1.8rem; }
+    .banner-section { height: 200px; }
+    .category-quick-nav { gap: 20px; }
+}
