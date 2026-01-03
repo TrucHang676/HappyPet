@@ -1346,7 +1346,7 @@ BEGIN
             WHERE MaKH = @MaKH;
         END
         
-        -- B4: Update trạng thái phiếu thành Hoàn Tất (HT)
+        -- B4: Update trạng thái phiếu thành Hoàn Tất (DHT)
         UPDATE PHIEU_DICH_VU 
         SET TrangThai = 'HT',
             TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian thanh toán
