@@ -224,6 +224,10 @@ const SelectVaccine = () => {
 
     // State tìm kiếm
     const [searchTerm, setSearchTerm] = useState('');
+    
+    // 🔥 State gói đang tiêm
+    const [ongoingPackage, setOngoingPackage] = useState(null);
+    const [isCheckingPackage, setIsCheckingPackage] = useState(true);
 
     useEffect(() => {
         if (!MaPhieu) {
@@ -239,7 +243,7 @@ const SelectVaccine = () => {
             const token = localStorage.getItem('token');
             const headers = { Authorization: `Bearer ${token}` };
 
-            // 1. Lấy dữ liệu
+            // 1. Lấy dữ liệu vaccines và packages TRƯỚC
             const resData = await axios.get('http://localhost:5000/api/booking/vaccine-data', { headers });
             setVaccines(resData.data.vaccines);
             setPackages(resData.data.packages);
@@ -250,7 +254,58 @@ const SelectVaccine = () => {
 
             // 2. Lấy giỏ hàng
             fetchSelected(headers);
-        } catch (error) { console.error(error); }
+            
+            // 3. Check gói đang tiêm (KHÔNG BLOCK, chạy riêng)
+            checkOngoingPackage(headers);
+            
+        } catch (error) { 
+            console.error('Lỗi load data:', error); 
+            setIsCheckingPackage(false);
+        }
+    };
+    
+    // Hàm riêng check gói đang tiêm
+    const checkOngoingPackage = async (headers) => {
+        try {
+            // Lấy thông tin phiếu để biết MaTC
+            const resPhieu = await axios.get(`http://localhost:5000/api/booking/booking-info/${MaPhieu}`, { headers });
+            const MaTC = resPhieu.data.MaTC;
+            
+            if (!MaTC) {
+                console.log('Phiếu chưa có MaTC');
+                setIsCheckingPackage(false);
+                return;
+            }
+            
+            // Check gói đang tiêm
+            const resCheck = await axios.get(`http://localhost:5000/api/booking/check-ongoing-package/${MaTC}`, { headers });
+            
+            if (resCheck.data && resCheck.data.MaGoi) {
+                console.log('🔥 GOI DANG TIEM:', resCheck.data);
+                setOngoingPackage(resCheck.data);
+                // Hiển thị thông báo
+                Swal.fire({
+                    icon: 'info',
+                    title: '⚠️ Thú cưng đang có gói tiêm dở!',
+                    html: `
+                        <div style="text-align: left;">
+                            <p><strong>Gói:</strong> ${resCheck.data.TenGoi}</p>
+                            <p><strong>Vaccine:</strong> ${resCheck.data.MaVaccine}</p>
+                            <p><strong>Tiến độ:</strong> ${resCheck.data.SoMuiDaTiem}/${resCheck.data.TongSoMui} mũi</p>
+                            <hr/>
+                            <p style="color: #f57c00;"><strong>Lưu ý:</strong> Bạn chỉ nên chọn <strong>Mũi Lẻ</strong> để tiêm thêm vaccine khác. Tab "Chọn Theo Gói" đã bị vô hiệu hóa.</p>
+                        </div>
+                    `,
+                    confirmButtonText: 'Đã hiểu'
+                });
+                // Force tab sang Mũi Lẻ
+                setActiveTab('single');
+            }
+        } catch (err) {
+            console.log('Không có gói đang tiêm hoặc lỗi:', err.message);
+        } finally {
+            setIsCheckingPackage(false);
+        }
     };
 
     const fetchSelected = async (headers) => {
@@ -322,13 +377,115 @@ const SelectVaccine = () => {
                     
                     {/* MENU TABS */}
                     <div className="tabs" style={{marginBottom: '15px'}}>
-                        <button style={{padding: '10px 20px', background: activeTab==='single' ? '#1565c0' : '#eee', color: activeTab==='single'?'white':'black', border:'none', marginRight:'5px', cursor:'pointer'}} onClick={() => setActiveTab('single')}>
+                        <button 
+                            style={{
+                                padding: '10px 20px', 
+                                background: activeTab==='single' ? '#1565c0' : '#eee', 
+                                color: activeTab==='single'?'white':'black', 
+                                border:'none', 
+                                marginRight:'5px', 
+                                cursor:'pointer'
+                            }} 
+                            onClick={() => setActiveTab('single')}
+                        >
                             Chọn Mũi Lẻ
                         </button>
-                        <button style={{padding: '10px 20px', background: activeTab==='package' ? '#1565c0' : '#eee', color: activeTab==='package'?'white':'black', border:'none', cursor:'pointer'}} onClick={() => setActiveTab('package')}>
+                        <button 
+                            style={{
+                                padding: '10px 20px', 
+                                background: activeTab==='package' ? '#1565c0' : '#eee', 
+                                color: activeTab==='package'?'white':'black', 
+                                border:'none', 
+                                cursor: 'pointer'
+                            }} 
+                            onClick={() => setActiveTab('package')}
+                        >
                             Chọn Theo Gói
                         </button>
                     </div>
+                    
+                    {/* Card gói đang tiêm */}
+                    {console.log('🎯 Render SelectVaccine, ongoingPackage:', ongoingPackage)}
+                    {ongoingPackage && (
+                        <div style={{
+                            padding: '15px', 
+                            background: 'linear-gradient(135deg, #e3f2fd 0%, #bbdefb 100%)', 
+                            border: '3px solid #1976d2', 
+                            borderRadius: '12px', 
+                            marginBottom: '20px',
+                            boxShadow: '0 4px 6px rgba(0,0,0,0.1)'
+                        }}>
+                            <div style={{display: 'flex', justifyContent: 'space-between', alignItems: 'center', marginBottom: '12px'}}>
+                                <h4 style={{margin: 0, color: '#1565c0', fontSize: '18px'}}>
+                                    💉 Gói Đang Tiêm
+                                </h4>
+                                <span style={{
+                                    background: '#4caf50',
+                                    color: 'white',
+                                    padding: '4px 12px',
+                                    borderRadius: '20px',
+                                    fontSize: '13px',
+                                    fontWeight: 'bold'
+                                }}>
+                                    Mũi {ongoingPackage.SoMuiDaTiem + 1}/{ongoingPackage.TongSoMui}
+                                </span>
+                            </div>
+                            
+                            <div style={{marginBottom: '12px', fontSize: '14px'}}>
+                                <div style={{marginBottom: '6px'}}>
+                                    <strong>📦 Gói:</strong> {ongoingPackage.TenGoi}
+                                </div>
+                                <div style={{marginBottom: '6px'}}>
+                                    <strong>💊 Vaccine:</strong> {ongoingPackage.MaVaccine}
+                                </div>
+                                <div>
+                                    <strong>📅 Hạn:</strong> {ongoingPackage.NgayHetHan ? new Date(ongoingPackage.NgayHetHan).toLocaleDateString('vi-VN') : 'Không giới hạn'}
+                                </div>
+                            </div>
+                            
+                            <button
+                                onClick={async () => {
+                                    try {
+                                        const token = localStorage.getItem('token');
+                                        const resPhieu = await axios.get(`http://localhost:5000/api/booking/booking-info/${MaPhieu}`, {
+                                            headers: { Authorization: `Bearer ${token}` }
+                                        });
+                                        const MaTC = resPhieu.data.MaTC;
+                                        
+                                        await axios.post('http://localhost:5000/api/booking/add-to-ongoing-package', 
+                                            { MaPhieu, MaTC },
+                                            { headers: { Authorization: `Bearer ${token}` } }
+                                        );
+                                        
+                                        Swal.fire('Thành công!', 'Đã thêm mũi tiếp theo vào gói!', 'success');
+                                        fetchSelected({ Authorization: `Bearer ${token}` });
+                                    } catch (err) {
+                                        Swal.fire('Lỗi', err.response?.data?.message || 'Không thể thêm!', 'error');
+                                    }
+                                }}
+                                style={{
+                                    width: '100%',
+                                    padding: '12px',
+                                    background: '#1976d2',
+                                    color: 'white',
+                                    border: 'none',
+                                    borderRadius: '8px',
+                                    fontSize: '16px',
+                                    fontWeight: 'bold',
+                                    cursor: 'pointer',
+                                    transition: 'all 0.3s'
+                                }}
+                                onMouseOver={(e) => e.target.style.background = '#1565c0'}
+                                onMouseOut={(e) => e.target.style.background = '#1976d2'}
+                            >
+                                ✅ Tiêm Tiếp Gói Này
+                            </button>
+                            
+                            <p style={{margin: '10px 0 0 0', fontSize: '13px', color: '#666', textAlign: 'center'}}>
+                                💡 Hoặc chọn vaccine lẻ khác ở dưới
+                            </p>
+                        </div>
+                    )}
 
                     {/* Ô TÌM KIẾM */}
                     <div style={{marginBottom: '15px'}}>
@@ -350,15 +507,47 @@ const SelectVaccine = () => {
                             filteredVaccines.length === 0 ? (
                                 <p style={{textAlign:'center', color:'#777'}}>Không tìm thấy vaccine nào phù hợp.</p>
                             ) : (
-                                filteredVaccines.map(v => (
-                                    <div key={v.MaVaccine} className="item-card" style={{border: '1px solid #ddd', padding: '10px', marginBottom: '10px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                                        <div>
-                                            <strong>{v.TenVaccine}</strong>
-                                            <p style={{margin:0, color:'#666'}}>{v.DonGia?.toLocaleString()} VNĐ</p>
+                                filteredVaccines.map(v => {
+                                    // Disable vaccine nếu đang trong gói dở
+                                    const isDisabled = ongoingPackage && v.MaVaccine === ongoingPackage.MaVaccine;
+                                    
+                                    return (
+                                        <div key={v.MaVaccine} className="item-card" style={{
+                                            border: '1px solid #ddd', 
+                                            padding: '10px', 
+                                            marginBottom: '10px', 
+                                            display:'flex', 
+                                            justifyContent:'space-between', 
+                                            alignItems:'center',
+                                            opacity: isDisabled ? 0.5 : 1
+                                        }}>
+                                            <div>
+                                                <strong>{v.TenVaccine}</strong>
+                                                {isDisabled && <span style={{color:'red', fontSize:'12px', marginLeft:'8px'}}>⚠️ Đang trong gói</span>}
+                                                <p style={{margin:0, fontSize:'13px', color:'#666'}}>{v.DonGia?.toLocaleString()} VNĐ</p>
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    if (isDisabled) {
+                                                        return Swal.fire('Lỗi', 'Vaccine này đang trong gói dở! Không thể thêm mũi lẻ.', 'error');
+                                                    }
+                                                    handleAction('add-single', { MaVaccine: v.MaVaccine });
+                                                }}
+                                                disabled={isDisabled}
+                                                style={{
+                                                    background: isDisabled ? '#ccc' : '#28a745', 
+                                                    color:'white', 
+                                                    border:'none', 
+                                                    padding:'5px 15px', 
+                                                    borderRadius:'4px', 
+                                                    cursor: isDisabled ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >
+                                                + Thêm
+                                            </button>
                                         </div>
-                                        <button onClick={() => handleAction('add-single', { MaVaccine: v.MaVaccine })} style={{background:'#2e7d32', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px', cursor:'pointer'}}>+ Thêm</button>
-                                    </div>
-                                ))
+                                    );
+                                })
                             )
                         ) : (
                             // --- TAB GÓI ---
@@ -384,21 +573,48 @@ const SelectVaccine = () => {
 
                                 <p style={{fontWeight:'bold', marginBottom:'10px'}}>👉 Bước 2: Chọn gói ưu đãi:</p>
 
-                                {packages.map(p => (
-                                    <div key={p.MaGoi} className="item-card" style={{border: '1px solid #ddd', padding: '10px', marginBottom: '10px', display:'flex', justifyContent:'space-between', alignItems:'center'}}>
-                                        <div>
-                                            <strong>{p.TenGoi}</strong> 
-                                            <span style={{fontSize:'12px', background:'#ff9800', marginLeft:'5px', padding:'2px 5px', borderRadius:'4px', color:'white'}}>Giảm {p.GiamGia * 100}%</span>
-                                            <p style={{margin:0, fontSize:'13px'}}>({p.SoMuiTuongUng} mũi - Hạn {p.ThoiHan} tháng)</p>
+                                {packages.map(p => {
+                                    // Disable gói nếu vaccine đang trong gói dở
+                                    const isDisabled = ongoingPackage && targetVaccineForPackage === ongoingPackage.MaVaccine;
+                                    
+                                    return (
+                                        <div key={p.MaGoi} className="item-card" style={{
+                                            border: '1px solid #ddd', 
+                                            padding: '10px', 
+                                            marginBottom: '10px', 
+                                            display:'flex', 
+                                            justifyContent:'space-between', 
+                                            alignItems:'center',
+                                            opacity: isDisabled ? 0.5 : 1
+                                        }}>
+                                            <div>
+                                                <strong>{p.TenGoi}</strong> 
+                                                <span style={{fontSize:'12px', background:'#ff9800', marginLeft:'5px', padding:'2px 5px', borderRadius:'4px', color:'white'}}>Giảm {p.GiamGia * 100}%</span>
+                                                <p style={{margin:0, fontSize:'13px'}}>({p.SoMuiTuongUng} mũi - Hạn {p.ThoiHan} tháng)</p>
+                                                {isDisabled && <p style={{margin:0, fontSize:'12px', color:'red'}}>⚠️ Vaccine này đang trong gói dở</p>}
+                                            </div>
+                                            <button 
+                                                onClick={() => {
+                                                    if (isDisabled) {
+                                                        return Swal.fire('Lỗi', 'Vaccine này đang trong gói dở! Không thể tạo gói mới.', 'error');
+                                                    }
+                                                    handleAction('add-package', { MaVaccine: targetVaccineForPackage, MaGoi: p.MaGoi });
+                                                }}
+                                                disabled={isDisabled}
+                                                style={{
+                                                    background: isDisabled ? '#ccc' : '#1565c0', 
+                                                    color:'white', 
+                                                    border:'none', 
+                                                    padding:'5px 10px', 
+                                                    borderRadius:'4px', 
+                                                    cursor: isDisabled ? 'not-allowed' : 'pointer'
+                                                }}
+                                            >
+                                                + Chọn Gói Này
+                                            </button>
                                         </div>
-                                        <button 
-                                            onClick={() => handleAction('add-package', { MaVaccine: targetVaccineForPackage, MaGoi: p.MaGoi })}
-                                            style={{background:'#1565c0', color:'white', border:'none', padding:'5px 10px', borderRadius:'4px', cursor:'pointer'}}
-                                        >
-                                            + Chọn Gói Này
-                                        </button>
-                                    </div>
-                                ))}
+                                    );
+                                })}
                             </div>
                         )}
                     </div>
@@ -411,7 +627,13 @@ const SelectVaccine = () => {
                         selectedItems.map((item, index) => (
                             <div key={index} style={{background: '#fff3e0', padding:'10px', marginBottom:'10px', borderRadius:'5px', border:'1px solid #ffe0b2'}}>
                                 <strong>{item.TenVaccine || 'Vaccine'}</strong>
-                                {item.MaGoi ? <div style={{color:'#d84315', fontSize:'13px', fontWeight:'bold'}}>📦 {item.TenGoi}</div> : <div style={{color:'green', fontSize:'13px'}}>💉 Mũi lẻ</div>}
+                                {item.MaGoi ? (
+                                    <div style={{color:'#d84315', fontSize:'13px', fontWeight:'bold'}}>📦 {item.TenGoi}</div>
+                                ) : item.NhacLai ? (
+                                    <div style={{color:'#1976d2', fontSize:'13px', fontWeight:'bold'}}>🔄 Mũi nhắc lại</div>
+                                ) : (
+                                    <div style={{color:'green', fontSize:'13px'}}>💉 Mũi lẻ</div>
+                                )}
                                 <div style={{display:'flex', justifyContent:'space-between', marginTop:'5px'}}>
                                     <span style={{fontWeight:'bold'}}>{item.ThanhTien?.toLocaleString()} đ</span>
                                     <button 

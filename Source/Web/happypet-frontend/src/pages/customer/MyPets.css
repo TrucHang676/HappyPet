@@ -1,102 +1,369 @@
-/* File: MyPets.css */
-.mypets-container { padding: 20px; }
-.header-section { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; }
-.btn-add { background-color: #28a745; color: white; padding: 10px 20px; border: none; cursor: pointer; border-radius: 5px; font-weight: bold; }
-.btn-add:hover { background-color: #218838; }
-
-/* Grid thẻ thú cưng */
-.pet-list { display: grid; grid-template-columns: repeat(auto-fill, minmax(300px, 1fr)); gap: 20px; }
-.pet-card { 
-    position: relative;
-    border: 1px solid #e0e0e0; padding: 15px; border-radius: 12px; 
-    display: flex; align-items: center; background: #fff; 
-    box-shadow: 0 4px 6px rgba(0,0,0,0.05); 
-    transition: transform 0.2s;
+/* --- TỔNG THỂ --- */
+.mypets-container {
+    padding: 40px;
+    max-width: 1200px;
+    margin: 0 auto;
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: #f8f9fa;
+    min-height: 100vh;
 }
-.pet-card:hover { transform: translateY(-5px); box-shadow: 0 6px 12px rgba(0,0,0,0.1); }
-.pet-icon { font-size: 45px; margin-right: 15px; background: #f8f9fa; padding: 10px; border-radius: 50%; }
 
-.pet-info h3 { margin: 0 0 5px 0; color: #333; }
-.pet-info p { margin: 3px 0; color: #666; font-size: 0.95rem; }
-.btn-detail { margin-top: 10px; padding: 6px 12px; background: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; font-size: 0.9rem; }
-.btn-detail:hover { background: #0056b3; }
+/* --- HEADER --- */
+.header-section {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 40px;
+}
 
-/* Badge giới tính */
-.gender-badge { font-size: 0.8em; color: #666; font-weight: normal; margin-left: 5px; }
+.header-section h2 {
+    font-size: 2rem;
+    color: #2c3e50;
+    margin: 0;
+    font-weight: 800;
+}
 
-/* CSS cho Popup (Modal) */
+.btn-add {
+    background: linear-gradient(135deg, #2ecc71 0%, #27ae60 100%);
+    color: white;
+    padding: 12px 28px;
+    border: none;
+    cursor: pointer;
+    border-radius: 50px;
+    font-weight: 700;
+    font-size: 1rem;
+    display: flex;
+    align-items: center;
+    box-shadow: 0 4px 15px rgba(46, 204, 113, 0.4);
+    transition: all 0.3s ease;
+}
+
+.btn-add:hover {
+    transform: translateY(-3px);
+    box-shadow: 0 6px 20px rgba(46, 204, 113, 0.5);
+}
+
+/* --- LIST & CARD --- */
+.pet-list {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 30px;
+}
+
+.empty-text {
+    text-align: center;
+    width: 100%;
+    grid-column: 1 / -1;
+    color: #95a5a6;
+    font-size: 1.2rem;
+    margin-top: 50px;
+}
+
+.pet-card {
+    position: relative;
+    background: white;
+    border-radius: 24px;
+    padding: 25px;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.05);
+    transition: all 0.3s ease;
+    border: 1px solid rgba(0,0,0,0.02);
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-align: center;
+    overflow: hidden;
+}
+
+.pet-card:hover {
+    transform: translateY(-10px);
+    box-shadow: 0 20px 40px rgba(0, 0, 0, 0.1);
+}
+
+.pet-icon {
+    width: 90px;
+    height: 90px;
+    background: #ecf0f1;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 45px;
+    margin-bottom: 20px;
+    margin-top: 15px;
+    border: 5px solid #fff;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+}
+
+.pet-info h3 {
+    margin: 0 0 10px 0;
+    color: #34495e;
+    font-size: 1.5rem;
+    font-weight: 800;
+}
+
+.pet-info p {
+    margin: 6px 0;
+    color: #7f8c8d;
+    font-size: 0.95rem;
+    width: 100%;
+    text-align: left;
+    padding-left: 15px;
+}
+
+.gender-badge {
+    display: inline-block;
+    padding: 3px 12px;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    font-weight: 700;
+    background-color: #e3f2fd;
+    color: #1976d2;
+    margin-left: 5px;
+}
+
+.card-actions {
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    display: flex;
+    gap: 8px;
+}
+
+.edit-icon, .delete-icon {
+    width: 35px;
+    height: 35px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    font-size: 0.9rem;
+    background: #f8f9fa;
+    transition: all 0.2s;
+    color: #95a5a6;
+}
+
+.edit-icon:hover { color: #3498db; background: #ebf5fb; }
+.delete-icon:hover { color: #e74c3c; background: #fce4e4; }
+
+.btn-detail {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background: linear-gradient(135deg, #3498db 0%, #2980b9 100%);
+    color: white;
+    border: none;
+    border-radius: 15px;
+    font-weight: 600;
+    cursor: pointer;
+    transition: all 0.3s;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 8px;
+    box-shadow: 0 4px 10px rgba(52, 152, 219, 0.3);
+}
+
+.btn-detail:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 15px rgba(52, 152, 219, 0.4);
+}
+
+/* --- MODAL (POPUP) --- */
 .modal-overlay {
     position: fixed; top: 0; left: 0; right: 0; bottom: 0;
     background: rgba(0, 0, 0, 0.6); 
+    backdrop-filter: blur(4px);
     display: flex; justify-content: center; align-items: center;
-    z-index: 1000;
+    z-index: 2000;
 }
+
+/* 🔥🔥🔥 FORM MẶC ĐỊNH (THÊM/SỬA) 
+   Cái này đã chỉnh rộng ra 700px
+*/
 .modal-content {
-    background: white; padding: 30px; border-radius: 10px;
-    width: 450px; max-width: 90%;
-    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
-    animation: fadeIn 0.3s ease-out;
+    background: white; 
+    padding: 35px; 
+    border-radius: 24px;
+    width: 700px;  /* Rộng 700px */
+    max-width: 95%; 
+    box-shadow: 0 25px 50px -12px rgba(0, 0, 0, 0.25);
+    animation: zoomIn 0.3s ease;
+    position: relative;
+    display: flex;
+    flex-direction: column;
 }
 
-@keyframes fadeIn { from { opacity: 0; transform: translateY(-20px); } to { opacity: 1; transform: translateY(0); } }
-
-.modal-content h3 { margin-top: 0; text-align: center; color: #007bff; }
-
-/* Form Styles */
-.modal-content label { display: block; margin-top: 12px; margin-bottom: 5px; font-weight: 600; font-size: 0.9em; color: #444; }
-.modal-content input, .modal-content select {
-    width: 100%; padding: 10px; margin: 0;
-    border: 1px solid #ccc; border-radius: 6px; box-sizing: border-box;
-    font-size: 1rem;
+/* 🔥🔥🔥 QUAN TRỌNG NHẤT: FORM LỊCH SỬ BỆNH ÁN 
+   Tui dùng .modal-content.modal-lg để ghi đè mọi thứ khác.
+   width: 95vw nghĩa là chiếm 95% chiều ngang màn hình.
+*/
+.modal-content.modal-lg {
+    width: 95vw !important;  /* Bung lụa 95% màn hình */
+    max-width: 1400px !important; /* Giới hạn tối đa nếu màn hình siêu to khổng lồ */
+    min-width: 800px; /* Đảm bảo không bị bé lại */
+    height: 90vh; /* Cao 90% màn hình */
+    display: flex;
+    flex-direction: column;
 }
-.modal-content input:focus, .modal-content select:focus { border-color: #007bff; outline: none; }
 
-.row-2-col { display: flex; gap: 15px; }
-.row-2-col div { flex: 1; }
+@keyframes zoomIn { 
+    from { opacity: 0; transform: scale(0.95); } 
+    to { opacity: 1; transform: scale(1); } 
+}
 
-.modal-actions { display: flex; justify-content: flex-end; gap: 10px; margin-top: 25px; }
-.btn-cancel { background: #6c757d; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-save { background: #007bff; color: white; border: none; padding: 10px 20px; border-radius: 6px; cursor: pointer; font-weight: bold; }
-.btn-save:hover { background: #0056b3; }
-.btn-cancel:hover { background: #5a6268; }
+.modal-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 20px;
+    padding-bottom: 15px;
+    border-bottom: 1px solid #f0f0f0;
+    flex-shrink: 0; 
+}
 
-/* Nút Xóa (Thùng rác) */
-.delete-icon {
-    position: absolute;
-    top: 10px;
-    right: 40px; /* Cách mép phải xa hơn bút chì một chút để không đè lên nhau */
+.modal-header h3 {
+    margin: 0;
+    color: #2c3e50;
+    font-size: 1.6rem;
+    font-weight: 800;
+}
+
+.close-icon {
     cursor: pointer;
-    color: #dc3545; /* Màu đỏ báo động */
-    font-size: 1.1rem;
-    padding: 5px;
-    transition: all 0.2s;
+    font-size: 1.5rem;
+    color: #bdc3c7;
+    transition: color 0.2s;
 }
+.close-icon:hover { color: #e74c3c; }
 
-.delete-icon:hover {
-    color: #c82333;
-    background-color: #ffe3e3; /* Nền đỏ nhạt khi di chuột */
-    border-radius: 50%;
-    transform: scale(1.1); /* Phóng to nhẹ */
+/* INPUTS */
+.modal-content label {
+    display: block; margin-top: 15px; margin-bottom: 8px;
+    font-weight: 600; color: #34495e; font-size: 0.95rem;
 }
+.modal-content input, .modal-content select, .modal-content textarea {
+    width: 100%; padding: 12px 16px; border: 2px solid #ecf0f1;
+    border-radius: 12px; font-size: 1rem; color: #2c3e50;
+    background-color: #fafafa; transition: all 0.3s; box-sizing: border-box;
+}
+.modal-content input:focus, .modal-content select:focus, .modal-content textarea:focus {
+    border-color: #3498db; background-color: white; outline: none;
+}
+.row-2-col { display: flex; gap: 20px; }
+.row-2-col div { flex: 1; }
+.modal-actions { display: flex; justify-content: flex-end; gap: 15px; margin-top: 35px; }
+.btn-cancel { background: #f1f2f6; color: #7f8c8d; padding: 12px 25px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
+.btn-save { background: #3498db; color: white; padding: 12px 35px; border-radius: 12px; border: none; font-weight: 700; cursor: pointer; }
 
-/* --- CODE MỚI CHO TAB BỆNH ÁN --- */
+/* --- TABS --- */
 .tabs-container {
     display: flex;
-    border-bottom: 2px solid #eee;
-    margin-bottom: 15px;
+    background: #f1f2f6;
+    padding: 6px;
+    border-radius: 50px;
+    margin-bottom: 20px;
+    flex-shrink: 0;
 }
+
 .tab-btn {
     flex: 1;
-    padding: 12px;
-    background: none; border: none;
+    padding: 10px;
+    border: none;
+    border-radius: 40px;
+    background: transparent;
+    color: #95a5a6;
+    font-weight: 700;
     cursor: pointer;
-    font-size: 16px; font-weight: bold; color: #666;
-    display: flex; align-items: center; justify-content: center; gap: 8px;
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
 }
-.tab-btn:hover { background-color: #f9f9f9; color: #007bff; }
-.tab-btn.active { color: #007bff; border-bottom: 3px solid #007bff; }
 
-.history-table { width: 100%; border-collapse: collapse; margin-top: 10px; }
-.history-table th, .history-table td { border: 1px solid #ddd; padding: 10px; text-align: left; }
-.history-table th { background-color: #f2f2f2; }
-.empty-text { text-align: center; color: #999; font-style: italic; padding: 20px; }
+.tab-btn:hover { color: #3498db; }
+.tab-btn.active { background: white; color: #3498db; box-shadow: 0 4px 10px rgba(0,0,0,0.08); }
+
+/* --- BẢNG LỊCH SỬ --- */
+.history-table-container {
+    flex-grow: 1;
+    overflow-x: auto; /* Cho phép cuộn ngang nếu màn hình quá bé */
+    overflow-y: auto; /* Cho phép cuộn dọc */
+    border-radius: 16px;
+    border: 1px solid #e0e0e0;
+    background: white;
+}
+
+.history-table {
+    width: 100%;
+    border-collapse: separate;
+    border-spacing: 0;
+    min-width: 800px; /* Đảm bảo bảng không bị co lại quá bé */
+}
+
+/* Header */
+.history-table thead th {
+    position: sticky;
+    top: 0;
+    background-color: #e3f2fd; /* Màu nền header */
+    color: #1565c0; 
+    font-weight: 800;
+    font-size: 0.9rem;
+    text-transform: uppercase;
+    padding: 16px;
+    text-align: left; /* Mặc định trái */
+    border-bottom: 2px solid #bbdefb;
+    z-index: 10;
+    white-space: nowrap;
+}
+
+/* Cell */
+.history-table tbody td {
+    padding: 16px;
+    border-bottom: 1px solid #f0f0f0;
+    color: #333;
+    font-size: 0.95rem;
+    vertical-align: middle; /* Căn giữa theo chiều dọc */
+    word-wrap: break-word;
+}
+
+.history-table tbody tr:hover { background-color: #fbfbfb; }
+
+/* Utility Classes canh chỉnh */
+.text-center { text-align: center !important; }
+.col-date { font-weight: 700; color: #455a64; white-space: nowrap; }
+
+/* Badges */
+.status-bad-cell { 
+    color: #d32f2f; font-weight: 700; background-color: #ffebee;
+    padding: 5px 12px !important; border-radius: 20px; display: inline-block;
+}
+.status-good-cell { 
+    color: #2e7d32; font-weight: 700; background-color: #e8f5e9;
+    padding: 5px 12px !important; border-radius: 20px; display: inline-block;
+}
+.text-muted { color: #666; font-size: 0.9rem; }
+
+/* 1. Cột ĐẦU TIÊN (Ngày Khám / Ngày Tiêm) - Mới thêm nè */
+.history-table th:first-child, 
+.history-table td:first-child {
+    text-align: center !important; /* Căn giữa */
+    padding-left: 40px !important; /* Đẩy nội dung lệch sang phải 40px */
+}
+
+/* 1. Cột cuối cùng (Chi nhánh / Người tiêm) */
+.history-table th:last-child, 
+.history-table td:last-child {
+    text-align: center !important; /* Vẫn giữ căn giữa */
+    padding-left: 60px !important; /* Đẩy nội dung lệch sang phải 60px */
+}
+
+/* 2. Cột thứ 4 (Bác sĩ) */
+.history-table th:nth-child(4),
+.history-table td:nth-child(4) {
+    text-align: center !important; /* Vẫn giữ căn giữa */
+    padding-left: 50px !important; /* Đẩy nội dung lệch sang phải 50px */
+}
+
+

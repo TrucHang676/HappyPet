@@ -276,8 +276,8 @@ const ExamDetail = () => {
                     >
                         <option value="">-- Chọn thuốc --</option>
                         {availableMedicines.map(med => (
-                            <option key={med.MaThuoc} value={med.MaThuoc}>
-                                {med.TenThuoc} (Tồn: {med.SoLuongTon}) - {formatMoney(med.DonGia)}
+                            <option key={med.MaMatHang} value={med.MaMatHang}>
+                                {med.TenMatHang} (Tồn: {med.SoLuongTon}) - {formatMoney(med.DonGia)}
                             </option>
                         ))}
                     </select>
@@ -362,7 +362,6 @@ const ExamDetail = () => {
                                             <th>Ngày khám</th>
                                             <th>Bác sĩ</th>
                                             <th>Chẩn đoán</th>
-                                            <th>Trạng thái</th>
                                         </tr>
                                     </thead>
                                     <tbody>
@@ -371,11 +370,7 @@ const ExamDetail = () => {
                                                 <td>{new Date(item.TG_ThucHienDV).toLocaleDateString('vi-VN')}</td>
                                                 <td>{item.BacSi || 'N/A'}</td>
                                                 <td style={{maxWidth: '300px'}}>{item.ChanDoan || 'Chưa có chẩn đoán'}</td>
-                                                <td>
-                                                    <span className={`status-badge ${item.TrangThai === 'HT' ? 'status-done' : 'status-processing'}`}>
-                                                        {item.TrangThai === 'HT' ? '✅ Hoàn tất' : '⏳ Đang xử lý'}
-                                                    </span>
-                                                </td>
+                                                {/* status removed as requested */}
                                             </tr>
                                         ))}
                                     </tbody>

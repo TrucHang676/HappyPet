@@ -231,10 +231,21 @@ const Cart = () => {
     if (loading) return <div className="empty-cart"><h2>⏳ Đang tải...</h2></div>;
 
     if (cartDetails.length === 0) return (
-        <div className="empty-cart">
-            <div className="empty-icon">🛒</div>
-            <h2>Giỏ hàng đang trống!</h2>
-            <button onClick={() => navigate('/products')}>ĐI MUA SẮM NGAY</button>
+        <div className="empty-cart-container">
+            {/* Dùng ảnh minh họa giỏ hàng trống dễ thương */}
+            <img 
+                src="https://cdni.iconscout.com/illustration/premium/thumb/empty-cart-5521508-4610092.png" 
+                alt="Empty Cart" 
+                className="empty-cart-image"
+            />
+            <h2 className="empty-cart-title">Giỏ hàng của bạn đang trống!</h2>
+            <p className="empty-cart-text">
+                Có vẻ như bạn chưa thêm bất kỳ sản phẩm nào. <br/>
+                Hãy khám phá các sản phẩm thú vị dành cho thú cưng ngay nhé! 🐶🐱
+            </p>
+            <button className="shop-now-btn" onClick={() => navigate('/products')}>
+                🛍️ ĐI MUA SẮM NGAY
+            </button>
         </div>
     );
 

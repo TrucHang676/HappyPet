@@ -18,14 +18,19 @@ router.post('/remove-medicine', verifyToken, doctorController.xoaThuocKhoiDon);
 router.post('/finish-exam', verifyToken, doctorController.ketThucKham);
 
 // ==================== TIÊM VACCINE ====================
-router.post('/them-goi-tiem', verifyToken, doctorController.themGoiTiem);
-router.delete('/xoa-goi-tiem', verifyToken, doctorController.xoaGoiTiem);
-router.post('/them-vaccine-le', verifyToken, doctorController.themVaccineLe);
-router.delete('/xoa-vaccine-le', verifyToken, doctorController.xoaVaccineLe);
-router.post('/ket-thuc-tiem', verifyToken, doctorController.ketThucTiem);
+router.get('/vaccine-packages', verifyToken, doctorController.getVaccinePackages);
+router.get('/vaccine-history/:MaTC', verifyToken, doctorController.getLichSuTiem); // 🔥 LỊCH SỬ TIÊM
+router.post('/add-vaccine-package', verifyToken, doctorController.themGoiTiem);
+router.post('/remove-vaccine-package', verifyToken, doctorController.xoaGoiTiem);
+router.post('/add-vaccine-single', verifyToken, doctorController.themVaccineLe); // 🔥 THÊM VACCINE LẺ
+router.post('/add-vaccine', verifyToken, doctorController.themVaccineLe); // Alias
+router.post('/remove-vaccine', verifyToken, doctorController.xoaVaccineLe);
+router.post('/complete-vaccine', verifyToken, doctorController.ketThucTiem);
+
+// ==================== XUẤT HÓA ĐƠN ====================
+router.post('/export-invoice', verifyToken, doctorController.exportInvoice); // 🔥 XUẤT HÓA ĐƠN
 
 // ==================== HELPER ====================
 router.get('/search-medicines', verifyToken, doctorController.searchMedicinesOrVaccines);
-router.get('/vaccine-packages', verifyToken, doctorController.getVaccinePackages);
 
 module.exports = router;

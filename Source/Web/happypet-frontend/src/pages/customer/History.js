@@ -260,8 +260,8 @@ const History = () => {
                                             </div>
                                         )}
                                         {order.NgayHenTaiKham && isCompleted && isServiceTicket && (
-                                            <div className="card-info-row" style={{fontSize: '14px', color: '#e67e22', fontWeight: 'bold', marginTop: '5px'}}>
-                                                🔔 Ngày tái khám: {dayjs(order.NgayHenTaiKham).format('DD/MM/YYYY')}
+                                            <div className="card-info-row" style={{fontSize: '14px', color: '#e67e22', fontWeight: 'bold', marginTop: '5px', background: '#fff3e0', padding: '8px', borderRadius: '5px', border: '2px solid #ff9800'}}>
+                                                🔔 Lịch tái khám: {dayjs(order.NgayHenTaiKham).format('DD/MM/YYYY')}
                                             </div>
                                         )}
                                         {renderStatus(order.TrangThai)}
@@ -367,7 +367,58 @@ const History = () => {
                                             <div className="medical-record" style={{padding: '15px', backgroundColor: '#f9f9f9', borderRadius: '8px', marginBottom:'10px'}}>
                                                 {order.TrieuChung && <p>🤒 <b>Triệu chứng:</b> {order.TrieuChung}</p>}
                                                 {order.ChanDoan && <p>👨‍⚕️ <b>Chẩn đoán:</b> {order.ChanDoan}</p>}
-                                                {order.DanhSachVaccine && <p style={{color:'#27ae60'}}>💉 <b>Vaccine:</b> {order.DanhSachVaccine}</p>}
+                                                {order.NgayHenTaiKham && (
+                                                    <p style={{color:'#ff9800', fontWeight:'bold', background:'#fff3e0', padding:'8px', borderRadius:'5px', marginTop:'10px'}}>
+                                                        📅 <b>Ngày hẹn tái khám:</b> {dayjs(order.NgayHenTaiKham).format('DD/MM/YYYY')}
+                                                    </p>
+                                                )}
+                                                {order.DanhSachVaccine && (
+                                                    <div style={{marginTop:'10px', padding:'10px', background:'#e8f5e9', borderRadius:'5px', border:'1px solid #4caf50'}}>
+                                                        <p style={{color:'#2e7d32', marginBottom:'5px'}}><b>💉 Danh sách Vaccine:</b></p>
+                                                        <div style={{fontSize:'14px', color:'#555', lineHeight:'1.8'}}>
+                                                            {order.DanhSachVaccine.split(',').map((vaccine, idx) => {
+                                                                const isPackage = vaccine.includes('[Theo gói]');
+                                                                const isReminder = vaccine.includes('[Mũi nhắc lại]');
+                                                                const isSingle = vaccine.includes('[Lẻ]');
+                                                                
+                                                                let badge = '';
+                                                                let badgeColor = '';
+                                                                
+                                                                if (isReminder) {
+                                                                    badge = '🔄 Nhắc lại';
+                                                                    badgeColor = '#9c27b0';
+                                                                } else if (isPackage) {
+                                                                    badge = '📦 Theo gói';
+                                                                    badgeColor = '#2196f3';
+                                                                } else if (isSingle) {
+                                                                    badge = '🎯 Tiêm lẻ';
+                                                                    badgeColor = '#ff9800';
+                                                                }
+                                                                
+                                                                const cleanName = vaccine.replace(/\[(Theo gói|Lẻ|Mũi nhắc lại)\]/g, '').trim();
+                                                                
+                                                                return (
+                                                                    <div key={idx} style={{marginBottom:'5px', display:'flex', alignItems:'center', gap:'8px'}}>
+                                                                        <span>•</span>
+                                                                        <span>{cleanName}</span>
+                                                                        {badge && (
+                                                                            <span style={{
+                                                                                background:badgeColor, 
+                                                                                color:'white', 
+                                                                                padding:'2px 8px', 
+                                                                                borderRadius:'12px', 
+                                                                                fontSize:'11px',
+                                                                                fontWeight:'bold'
+                                                                            }}>
+                                                                                {badge}
+                                                                            </span>
+                                                                        )}
+                                                                    </div>
+                                                                );
+                                                            })}
+                                                        </div>
+                                                    </div>
+                                                )}
                                                 
                                                 {isCompleted && (
                                                     <div style={{marginTop:'10px', borderTop:'1px dashed #ccc', paddingTop:'10px', textAlign:'right'}}>

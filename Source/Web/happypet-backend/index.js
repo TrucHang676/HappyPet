@@ -95,6 +95,7 @@ const branchRoutes = require('./routes/branchRoutes');
 // 🔥🔥🔥 BÀ THIẾU 2 DÒNG NÀY NÈ TRỜI ƠI!!! 👇👇👇
 const employeeRoutes = require('./routes/employeeRoutes');
 const doctorRoutes = require('./routes/doctorRoutes');
+const managerRoutes = require('./routes/managerRoutes'); // 🔥 THÊM MANAGER ROUTES
 
 // --- IMPORT CONTROLLER ---
 const productController = require('./controllers/productController');
@@ -142,6 +143,12 @@ app.use('/api/booking', verifyToken, bookingRoutes);
 // (Không có dòng này thì Server không biết đường dẫn /api/employee là gì cả)
 app.use('/api/employee', verifyToken, employeeRoutes);
 app.use('/api/doctor', verifyToken, doctorRoutes);
+app.use('/api/manager', verifyToken, managerRoutes); // 🔥 THÊM MANAGER ROUTES (cũ - giữ tạm cho tương thích)
+
+// 🔥 MỚI: Phân quyền rõ ràng cho 2 cấp quản lý
+const { verifyBranchManager, verifyDirector } = require('./middleware/authMiddleware');
+app.use('/api/branch-manager', verifyBranchManager, require('./routes/branchManagerRoutes')); // Quản lý chi nhánh
+app.use('/api/director', verifyDirector, require('./routes/directorRoutes')); // Giám đốc
 
 
 // REVIEW API

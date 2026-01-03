@@ -16,16 +16,6 @@ exports.getDoctorSchedule = async (req, res) => {
     }
 };
 
-// 1. Lấy danh sách chi nhánh
-// exports.getBranches = async (req, res) => {
-//     try {
-//         const pool = await sql.connect();
-//         const result = await pool.request().query('SELECT * FROM CHI_NHANH');
-//         res.json(result.recordset);
-//     } catch (error) {
-//         res.status(500).json({ message: error.message });
-//     }
-// };
 
 // 1. LẤY DANH SÁCH CHI NHÁNH (Gọi SP: sp_XemDanhSachChiNhanh)
 // 1. LẤY DANH SÁCH CHI NHÁNH (CHUẨN)
@@ -242,7 +232,16 @@ exports.getMyBookings = async (req, res) => {
             .input('MaKH', sql.NChar(10), MaUser)
             .execute('sp_XemLichSuHoatDong'); 
 
-        res.json(result.recordset);
+        // 🔥 TRIM TẤT CẢ STRING FIELDS ĐỂ LOẠI BỎ KHOẢNG TRẮNG NCHAR
+        const trimmedData = result.recordset.map(item => {
+            const trimmed = {};
+            for (let key in item) {
+                trimmed[key] = typeof item[key] === 'string' ? item[key].trim() : item[key];
+            }
+            return trimmed;
+        });
+
+        res.json(trimmedData);
     } catch (err) {
         console.error("Lỗi lấy lịch sử:", err);
         res.status(500).json({ message: 'Lỗi lấy dữ liệu lịch sử' });
@@ -269,5 +268,83 @@ exports.cancelBooking = async (req, res) => {
         console.error("Lỗi hủy hẹn:", err);
         // Lỗi 2 tiếng hay lỗi trạng thái sẽ được trả về ở đây
         res.status(400).json({ message: err.message || 'Không thể hủy lịch hẹn này.' });
+    }
+};
+
+// ============================================================
+// 11. LẤY THÔNG TIN PHIẾU (MaTC, MaKH)
+// ============================================================
+exports.getBookingInfo = async (req, res) => {
+    const { maPhieu } = req.params;
+    try {
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('MaPhieu', sql.NChar(10), maPhieu)
+            .query(`
+                SELECT P.MaPhieu, P.MaKH, 
+                       CASE 
+                           WHEN PKB.MaTC IS NOT NULL THEN PKB.MaTC
+                           WHEN PTV.MaTC IS NOT NULL THEN PTV.MaTC
+                           ELSE NULL
+                       END AS MaTC
+                FROM PHIEU_DICH_VU P
+                LEFT JOIN PHIEU_KHAM_BENH PKB ON P.MaPhieu = PKB.MaPhieu
+                LEFT JOIN PHIEU_TIEM_VACCINE PTV ON P.MaPhieu = PTV.MaPhieu
+                WHERE P.MaPhieu = @MaPhieu
+            `);
+        
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy phiếu' });
+        }
+        
+        res.json(result.recordset[0]);
+    } catch (err) {
+        console.error('Lỗi lấy thông tin phiếu:', err);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ============================================================
+// 12. CHECK GÓI VACCINE ĐANG TIÊM DỞ
+// ============================================================
+exports.checkOngoingPackage = async (req, res) => {
+    const { maTC } = req.params;
+    try {
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('MaTC', sql.NChar(10), maTC)
+            .execute('sp_KiemTraGoiDangTiem');
+        
+        if (result.recordset.length === 0) {
+            return res.json(null); // Không có gói đang tiêm
+        }
+        
+        res.json(result.recordset[0]);
+    } catch (err) {
+        console.error('Lỗi check gói đang tiêm:', err);
+        res.status(500).json({ message: err.message });
+    }
+};
+
+// ============================================================
+// 13. THÊM VACCINE VÀO GÓI ĐANG TIÊM (MŨI TIẾP THEO)
+// ============================================================
+exports.addVaccineToOngoingPackage = async (req, res) => {
+    const { MaPhieu, MaTC } = req.body;
+    try {
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('MaPhieu', sql.NChar(10), MaPhieu)
+            .input('MaTC', sql.NChar(10), MaTC)
+            .execute('sp_ThemVaccineVaoGoiDangTiem');
+        
+        res.json({
+            success: true,
+            message: result.recordset[0].Message,
+            data: result.recordset[0]
+        });
+    } catch (err) {
+        console.error('Lỗi thêm vaccine vào gói:', err);
+        res.status(500).json({ success: false, message: err.message });
     }
 };

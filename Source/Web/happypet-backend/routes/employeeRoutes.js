@@ -60,7 +60,11 @@ router.get('/search-customer', employeeController.searchCustomerByPhone);
 // POST: /api/employee/walk-in
 router.post('/walk-in', employeeController.createDirectAppointment);
 
-// 5. Xác nhận đã giao hàng (Nhân viên)
+// 5a. Tạo phiếu vãng lai với thông tin đầy đủ (KH mới hoặc thú mới)
+// POST: /api/employee/walk-in-full
+router.post('/walk-in-full', employeeController.createWalkInWithFullInfo);
+
+// 6. Xác nhận đã giao hàng (Nhân viên)
 router.post('/confirm-delivery', employeeController.confirmDelivery);
 
 // 6. Tự động hủy lịch hẹn quá hạn 120 phút
@@ -68,5 +72,20 @@ router.post('/auto-huy-hen', employeeController.autoHuyLichHen);
 
 // 7. Lấy chi tiết sản phẩm trong đơn hàng
 router.get('/order-detail/:maPhieu', employeeController.getOrderDetail);
+
+// 8. 🔥 MỚI: Lấy danh sách lịch hẹn tái khám
+router.get('/recheck-appointments', employeeController.getRecheckAppointments);
+
+// 9. 🔥 MỚI: Xuất hóa đơn trực tiếp (Sau khi hoàn tất dịch vụ)
+router.post('/export-invoice', employeeController.exportInvoice);
+
+// 10. 🔥 ĐĂNG KÝ KHÁCH HÀNG ĐƠN GIẢN (CHO BÁN HÀNG TRỰC TIẾP)
+router.post('/create-customer-simple', employeeController.createCustomerSimple);
+
+// 11. 🔥 LẤY DANH SÁCH SẢN PHẨM (CHO BÁN HÀNG TRỰC TIẾP)
+router.get('/products', employeeController.getProducts);
+
+// 12. 🔥 BÁN HÀNG TRỰC TIẾP (KHÔNG CẦN THÚ CƯNG)
+router.post('/direct-sale', employeeController.directSale);
 
 module.exports = router;

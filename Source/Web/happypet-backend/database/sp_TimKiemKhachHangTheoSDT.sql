@@ -30,7 +30,9 @@ BEGIN
         u.HoTen, 
         kh.SDT, 
         kh.Email,
-        kh.TongDiemTichLuy
+        kh.TongDiemTichLuy,
+        u.GioiTinhUser,
+        kh.DiaChi
     FROM KHACH_HANG kh
     JOIN [USER] u ON kh.MaKH = u.MaUser
     WHERE kh.MaKH = @MaKH;

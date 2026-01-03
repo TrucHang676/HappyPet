@@ -38,4 +38,32 @@ const verifyStaff = (req, res, next) => {
     });
 };
 
-module.exports = { verifyToken, verifyStaff };
+// 3. Hàm phân quyền: Chỉ cho phép Quản lý chi nhánh (ChucVuCuThe = 'Quản lý chi nhánh')
+const verifyBranchManager = (req, res, next) => {
+    verifyToken(req, res, () => {
+        const chucVu = req.user.ChucVuCuThe || '';
+        
+        // Kiểm tra chức vụ có phải là Quản lý chi nhánh hoặc Giám đốc không
+        if (chucVu === 'Quản lý chi nhánh' || chucVu === 'Giám đốc' || req.user.Role === 'ADMIN') {
+            next();
+        } else {
+            res.status(403).json({ message: 'Chỉ Quản lý chi nhánh mới được truy cập!' });
+        }
+    });
+};
+
+// 4. Hàm phân quyền: Chỉ cho phép Giám đốc (ChucVuCuThe = 'Giám đốc')
+const verifyDirector = (req, res, next) => {
+    verifyToken(req, res, () => {
+        const chucVu = req.user.ChucVuCuThe || '';
+        
+        // Chỉ Giám đốc mới được truy cập API cấp công ty
+        if (chucVu === 'Giám đốc' || req.user.Role === 'ADMIN') {
+            next();
+        } else {
+            res.status(403).json({ message: 'Chỉ Giám đốc mới được truy cập!' });
+        }
+    });
+};
+
+module.exports = { verifyToken, verifyStaff, verifyBranchManager, verifyDirector };

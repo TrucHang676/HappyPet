@@ -11,6 +11,7 @@ const MyBookings = () => {
     const [bookings, setBookings] = useState([]);
     const [loading, setLoading] = useState(true);
     const [activeTab, setActiveTab] = useState('ALL'); 
+    const [filterType, setFilterType] = useState('ALL'); // ✅ Thêm filter loại phiếu
     const [openMaPhieu, setOpenMaPhieu] = useState(null); 
     const [reviewModal, setReviewModal] = useState(null);
     const navigate = useNavigate();
@@ -85,11 +86,20 @@ const MyBookings = () => {
 
     const displayList = bookings.filter(item => {
         const st = item.TrangThai?.trim().toUpperCase();
-        if (activeTab === 'ALL') return true;
-        if (activeTab === 'UPCOMING') return st === 'DD' || st === 'DTH';
-        if (activeTab === 'COMPLETED') return st === 'DHT' || st === 'HT';
-        if (activeTab === 'CANCELLED') return st === 'HUY' || st === 'DH';
-        return true;
+        const loaiPhieu = item.LoaiPhieu?.trim().toUpperCase();
+        
+        // Filter theo trạng thái
+        let passStatus = true;
+        if (activeTab === 'UPCOMING') passStatus = st === 'DD' || st === 'DTH';
+        else if (activeTab === 'COMPLETED') passStatus = st === 'DHT' || st === 'HT';
+        else if (activeTab === 'CANCELLED') passStatus = st === 'HUY' || st === 'DH';
+        
+        // ✅ Filter theo loại phiếu
+        let passType = true;
+        if (filterType === 'KB') passType = loaiPhieu === 'KB';
+        else if (filterType === 'TV') passType = loaiPhieu === 'TV';
+        
+        return passStatus && passType;
     });
 
     return (
@@ -103,6 +113,19 @@ const MyBookings = () => {
                 <button onClick={() => setActiveTab('CANCELLED')} className={activeTab === 'CANCELLED' ? 'tab-active' : 'tab-item'}>Đã hủy</button>
             </div>
 
+            {/* ✅ Filter theo loại phiếu */}
+            <div style={{display:'flex', gap:'10px', marginBottom:'15px', justifyContent:'center'}}>
+                <button onClick={() => setFilterType('ALL')} style={{padding:'8px 16px', border:'1px solid #ddd', borderRadius:'20px', background: filterType === 'ALL' ? '#007bff' : '#fff', color: filterType === 'ALL' ? '#fff' : '#333', cursor:'pointer', fontWeight: filterType === 'ALL' ? 'bold' : 'normal'}}>
+                    🐾 Tất cả
+                </button>
+                <button onClick={() => setFilterType('KB')} style={{padding:'8px 16px', border:'1px solid #ddd', borderRadius:'20px', background: filterType === 'KB' ? '#28a745' : '#fff', color: filterType === 'KB' ? '#fff' : '#333', cursor:'pointer', fontWeight: filterType === 'KB' ? 'bold' : 'normal'}}>
+                    🩺 Khám bệnh
+                </button>
+                <button onClick={() => setFilterType('TV')} style={{padding:'8px 16px', border:'1px solid #ddd', borderRadius:'20px', background: filterType === 'TV' ? '#17a2b8' : '#fff', color: filterType === 'TV' ? '#fff' : '#333', cursor:'pointer', fontWeight: filterType === 'TV' ? 'bold' : 'normal'}}>
+                    💉 Tiêm vaccine
+                </button>
+            </div>
+
             {loading ? <p>Đang tải...</p> : (
                 displayList.length === 0 ? 
                 <p style={{textAlign:'center', color:'#777', fontStyle:'italic', marginTop:'20px'}}>Không có phiếu nào trong danh sách này.</p> 
@@ -111,8 +134,8 @@ const MyBookings = () => {
                     {displayList.map((item) => {
                         const isCompleted = ['DHT', 'HT'].includes(item.TrangThai?.trim().toUpperCase());
                         
-                        // 🔥 SỬA CHỖ NÀY: Quét mọi trường có thể có 🔥
-                        const petName = item.TenPet || item.TenThuCung || item.TenTC || item.petName || item.PetName || item.MaThuCung || "Không rõ tên";
+                        // 🔥 SỬA CHỖ NÀY: Quét mọi trường có thể có + trim khoảng trắng NCHAR 🔥
+                        const petName = (item.TenPet || item.TenThuCung || item.TenTC || item.petName || item.PetName || item.MaThuCung || "").trim() || "Không rõ tên";
                         
                         // 🔥 FIX TIMEZONE: Hiển thị TG_ThucHienDV (thời gian hẹn/nhận)
                         const appointmentDateTime = item.NgayMua ? String(item.NgayMua).replace(/Z$/, '') : null;
@@ -128,7 +151,7 @@ const MyBookings = () => {
                                 <div style={{display:'flex', justifyContent:'space-between', alignItems:'center', width: '100%'}}>
                                     <div>
                                         <h4 style={{margin:'0 0 5px 0', color:'#333'}}>
-                                            {item.LoaiPhieu === 'KB' ? 'Khám Bệnh' : 'Dịch Vụ'} #{item.MaPhieu}
+                                            {item.LoaiPhieu === 'KB' ? 'Khám Bệnh' : 'Tiêm Vaccine'} #{item.MaPhieu}
                                             <span style={{fontWeight:'normal', fontSize:'14px', color:'#777'}}> - 🕒 {timeStr} {dateStr}</span>
                                         </h4>
                                         
@@ -159,6 +182,12 @@ const MyBookings = () => {
                                     <div style={{marginTop:'15px', paddingTop:'15px', borderTop:'1px dashed #eee'}}>
                                         {item.TrieuChung && <p style={{margin:'5px 0'}}>🤒 <b>Triệu chứng:</b> {item.TrieuChung}</p>}
                                         {item.ChanDoan && <p style={{margin:'5px 0'}}>👨‍⚕️ <b>Chẩn đoán:</b> {item.ChanDoan}</p>}
+                                        {/* ✅ Hiển thị ngày tái khám */}
+                                        {item.LoaiPhieu === 'KB' && item.NgayHenTaiKham && (
+                                            <p style={{margin:'5px 0', color:'#dc3545', fontWeight:'bold'}}>
+                                                📅 <b>Ngày hẹn tái khám:</b> {new Date(item.NgayHenTaiKham).toLocaleDateString('vi-VN')}
+                                            </p>
+                                        )}
                                         {item.DanhSachVaccine && <p style={{margin:'5px 0', color:'#28a745'}}>💉 <b>Vaccine:</b> {item.DanhSachVaccine}</p>}
                                         {!item.TrieuChung && !item.ChanDoan && !item.DanhSachVaccine && <p style={{color:'#999', fontStyle:'italic'}}>Chưa có thông tin y tế.</p>}
 

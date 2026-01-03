@@ -575,7 +575,9 @@ CREATE OR ALTER PROC sp_TaoPhieuTrucTiep
     @MaCN NCHAR(10),
     @MaNV NCHAR(10), 
     @LoaiPhieu VARCHAR(2), 
-    @TrieuChung NVARCHAR(200) = NULL
+    @TrieuChung NVARCHAR(200) = NULL,
+    @MaVaccine NCHAR(10) = NULL,  -- Vaccine lẻ (nếu có)
+    @MaGoi NCHAR(10) = NULL        -- Gói tiêm (nếu có)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -600,6 +602,35 @@ BEGIN
         BEGIN
             RAISERROR(N'Lỗi: Thú cưng này không tồn tại hoặc không thuộc về khách hàng đang chọn!', 16, 1);
             RETURN;
+        END
+    END
+    
+    -- Validate vaccine nếu là phiếu tiêm vaccine
+    IF @LoaiPhieu = 'TV'
+    BEGIN
+        -- Nếu chọn vaccine lẻ, kiểm tra tồn kho
+        IF @MaVaccine IS NOT NULL
+        BEGIN
+            DECLARE @TonKho INT;
+            SELECT @TonKho = SoLuongTon 
+            FROM TON_KHO 
+            WHERE MaCN = @MaCN AND MaMatHang = @MaVaccine;
+            
+            IF ISNULL(@TonKho, 0) < 1
+            BEGIN
+                RAISERROR(N'Lỗi: Vaccine đã hết hàng hoặc không tồn tại!', 16, 1);
+                RETURN;
+            END
+        END
+        
+        -- Nếu chọn gói tiêm, kiểm tra gói tồn tại
+        IF @MaGoi IS NOT NULL
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM GOI_TIEM_VC WHERE MaGoi = @MaGoi)
+            BEGIN
+                RAISERROR(N'Lỗi: Gói tiêm không tồn tại!', 16, 1);
+                RETURN;
+            END
         END
     END
 
@@ -922,11 +953,12 @@ BEGIN
         INNER JOIN CT_TIEM_VC c ON k.MaMatHang = c.MaVaccine
         WHERE c.MaPhieu = @MaPhieu AND k.MaCN = @MaCN;
 
-        -- Xóa dữ liệu chi tiết
+        -- Xóa dữ liệu chi tiết (CHỈ XÓA CT, KHÔNG XÓA PHIẾU CHÍNH)
         DELETE FROM CT_TIEM_VC WHERE MaPhieu = @MaPhieu;
         DELETE FROM DANG_KI_GOI_TIEM WHERE MaPhieu = @MaPhieu;
-        DELETE FROM PHIEU_KHAM_BENH WHERE MaPhieu = @MaPhieu;
-        DELETE FROM PHIEU_TIEM_VACCINE WHERE MaPhieu = @MaPhieu;
+        -- ❌ KHÔNG XÓA 2 DÒNG NÀY ĐỂ GIỮ THÔNG TIN THÚ CƯNG KHI ĐÃ HỦY
+        -- DELETE FROM PHIEU_KHAM_BENH WHERE MaPhieu = @MaPhieu;
+        -- DELETE FROM PHIEU_TIEM_VACCINE WHERE MaPhieu = @MaPhieu;
 
         -- Cập nhật trạng thái phiếu
         UPDATE PHIEU_DICH_VU
@@ -1072,8 +1104,9 @@ BEGIN
             -- =========================================================
             DELETE FROM CT_TIEM_VC WHERE MaPhieu = @Cur_MaPhieu;
             DELETE FROM DANG_KI_GOI_TIEM WHERE MaPhieu = @Cur_MaPhieu;
-            DELETE FROM PHIEU_KHAM_BENH WHERE MaPhieu = @Cur_MaPhieu;
-            DELETE FROM PHIEU_TIEM_VACCINE WHERE MaPhieu = @Cur_MaPhieu;
+            -- ❌ KHÔNG XÓA 2 DÒNG NÀY ĐỂ GIỮ THÔNG TIN THÚ CƯNG KHI HỆ THỐNG TỰ HỦY
+            -- DELETE FROM PHIEU_KHAM_BENH WHERE MaPhieu = @Cur_MaPhieu;
+            -- DELETE FROM PHIEU_TIEM_VACCINE WHERE MaPhieu = @Cur_MaPhieu;
 
             UPDATE PHIEU_DICH_VU
             SET TrangThai = 'DH'

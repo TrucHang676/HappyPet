@@ -12,6 +12,7 @@ const Booking = () => {
     const [pets, setPets] = useState([]);
     const [selectedBranchInfo, setSelectedBranchInfo] = useState(null);
     const [timeSlots, setTimeSlots] = useState([]); 
+    const [ongoingPackage, setOngoingPackage] = useState(null); // 🔥 GÓI ĐANG TIÊM
 
     const [formData, setFormData] = useState({
         MaTC: '',
@@ -122,7 +123,42 @@ const Booking = () => {
     };
 
     const handleChange = (e) => {
-        setFormData({ ...formData, [e.target.name]: e.target.value });
+        const { name, value } = e.target;
+        setFormData({ ...formData, [name]: value });
+        
+        // 🔥 Khi chọn thú cưng MỚI + Loại phiếu là TV → Check gói đang tiêm
+        if (name === 'MaTC' && value && formData.LoaiPhieu === 'TV') {
+            checkOngoingVaccinePackage(value);
+        }
+        
+        // 🔥 Khi chọn LoaiPhieu = TV → Check gói đang tiêm
+        if (name === 'LoaiPhieu' && value === 'TV' && formData.MaTC) {
+            checkOngoingVaccinePackage(formData.MaTC);
+        }
+        
+        // Nếu chọn KB → Xóa thông báo gói
+        if (name === 'LoaiPhieu' && value === 'KB') {
+            setOngoingPackage(null);
+        }
+    };
+    
+    // 🔥 HÀM KIỂM TRA GÓI VACCINE ĐANG TIÊM
+    const checkOngoingVaccinePackage = async (MaTC) => {
+        try {
+            const token = localStorage.getItem('token');
+            const res = await axios.get(`http://localhost:5000/api/pets/check-ongoing-vaccine/${MaTC}`, {
+                headers: { Authorization: `Bearer ${token}` }
+            });
+            
+            if (res.data.hasOngoingPackage) {
+                setOngoingPackage(res.data.packageInfo);
+            } else {
+                setOngoingPackage(null);
+            }
+        } catch (error) {
+            console.error('Lỗi check gói vaccine:', error);
+            setOngoingPackage(null);
+        }
     };
 
     const handleViewDoctorSchedule = async () => {
@@ -248,13 +284,38 @@ const Booking = () => {
                     {pets.length === 0 ? (
                         <p style={{color:'red'}}>Bạn chưa có thú cưng nào.</p>
                     ) : (
-                        <select name="MaTC" value={formData.MaTC} onChange={handleChange} required className="input-field">
-                            {pets.map(pet => (
-                                <option key={pet.MaTC} value={pet.MaTC}>
-                                    {pet.Ten} - {pet.Loai} ({pet.Giong})
-                                </option>
-                            ))}
-                        </select>
+                        <>
+                            <select name="MaTC" value={formData.MaTC} onChange={handleChange} required className="input-field">
+                                {pets.map(pet => (
+                                    <option key={pet.MaTC} value={pet.MaTC}>
+                                        {pet.Ten} - {pet.Loai} ({pet.Giong})
+                                    </option>
+                                ))}
+                            </select>
+                            
+                            {/* 🔥 THÔNG BÁO GÓI ĐANG TIÊM */}
+                            {ongoingPackage && formData.LoaiPhieu === 'TV' && (
+                                <div style={{
+                                    marginTop: '10px', 
+                                    padding: '12px', 
+                                    background: '#fff3cd', 
+                                    border: '1px solid #ffc107', 
+                                    borderRadius: '5px',
+                                    fontSize: '14px'
+                                }}>
+                                    <strong>⚠️ Lưu ý:</strong> Bé <strong>{pets.find(p => p.MaTC === formData.MaTC)?.Ten}</strong> đang có gói vaccine chưa hoàn thành:
+                                    <ul style={{margin: '5px 0', paddingLeft: '20px'}}>
+                                        <li>📦 Gói: <strong>{ongoingPackage.TenGoi}</strong></li>
+                                        <li>💉 Đã tiêm: <strong>{ongoingPackage.SoMuiDaTiem}/{ongoingPackage.TongSoMui} mũi</strong></li>
+                                        <li>🔄 Còn lại: <strong>{ongoingPackage.SoMuiConLai} mũi</strong></li>
+                                    </ul>
+                                    <p style={{color: '#856404', fontWeight: 'bold', margin: '5px 0 0 0'}}>
+                                        → Khi đến phòng khám, bác sĩ sẽ tiêm tiếp mũi tiếp theo của gói này. <br/>
+                                        Nếu muốn tiêm vaccine khác, vui lòng thông báo với bác sĩ!
+                                    </p>
+                                </div>
+                            )}
+                        </>
                     )}
                 </div>
 

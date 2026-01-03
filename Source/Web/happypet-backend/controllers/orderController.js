@@ -51,11 +51,19 @@ exports.getOrderHistory = async (req, res) => {
                 -- THÔNG TIN Y TẾ
                 PKB.TrieuChung, PKB.ChanDoan, PKB.NgayHenTaiKham,
                 
-                -- DANH SÁCH VACCINE
-                (SELECT STRING_AGG(MH_V.TenMatHang + N' (' + CAST(CTV.LieuLuong AS NVARCHAR) + 'ml)', ', ') 
+                -- DANH SÁCH VACCINE (phân biệt lẻ và theo gói)
+                (SELECT STRING_AGG(
+                    MH_V.TenMatHang + N' (' + CAST(CTV.LieuLuong AS NVARCHAR) + 'ml)' + 
+                    CASE 
+                        WHEN CTV.NhacLai = 1 THEN N' [Mũi nhắc lại]'
+                        WHEN DK.MaGoi IS NOT NULL THEN N' [Theo gói]'
+                        ELSE N' [Lẻ]'
+                    END
+                , ', ') 
                 FROM CT_TIEM_VC CTV 
                 JOIN VACCINE V ON CTV.MaVaccine = V.MaVaccine
                 JOIN MAT_HANG MH_V ON V.MaVaccine = MH_V.MaMatHang
+                LEFT JOIN DANG_KI_GOI_TIEM DK ON CTV.MaPhieu = DK.MaPhieu AND CTV.MaVaccine = DK.MaVaccine
                 WHERE CTV.MaPhieu = P.MaPhieu) AS DanhSachVaccine
 
             FROM PHIEU_DICH_VU P

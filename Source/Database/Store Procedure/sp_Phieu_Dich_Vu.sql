@@ -345,16 +345,42 @@ BEGIN
         SET @ThanhTien = 0; -- Free
     END
 
-    -- 3. THỰC THI
+    -- 3. TÍNH SỐ MŨI (Nếu theo gói thì tính, nếu lẻ thì để "1 liều")
+    DECLARE @LieuLuongText NVARCHAR(50);
+    
+    IF @TheoGoi = 1
+    BEGIN
+        -- Tính số mũi ĐÃ TIÊM (bao gồm lịch sử)
+        DECLARE @SoMuiDaTiem_Current INT;
+        SELECT @SoMuiDaTiem_Current = COUNT(*)
+        FROM CT_TIEM_VC CT
+        JOIN PHIEU_DICH_VU P ON CT.MaPhieu = P.MaPhieu
+        WHERE P.MaKH = (SELECT MaKH FROM PHIEU_DICH_VU WHERE MaPhieu = @MaPhieu)
+          AND CT.MaVaccine = @MaVaccine
+          AND P.TG_LapPhieu >= @NgayDangKyGoi;
+        
+        -- Mũi tiếp theo = số mũi đã tiêm + 1
+        DECLARE @SoMuiTiepTheo INT = ISNULL(@SoMuiDaTiem_Current, 0) + 1;
+        
+        -- Format: "Mũi 1/3", "Mũi 2/3"...
+        SET @LieuLuongText = N'Mũi ' + CAST(@SoMuiTiepTheo AS NVARCHAR(5)) + N'/' + CAST(@SoMuiQuyDinh AS NVARCHAR(5));
+    END
+    ELSE
+    BEGIN
+        -- Mua lẻ thì để text đơn giản
+        SET @LieuLuongText = N'1 liều';
+    END
+
+    -- 4. THỰC THI
     BEGIN TRANSACTION;
     BEGIN TRY
         -- B1: Trừ kho giữ chỗ
         UPDATE TON_KHO SET SoLuongTon = SoLuongTon - 1 
         WHERE MaCN = @MaCN AND MaMatHang = @MaVaccine;
 
-        -- B2: Thêm vào chi tiết (Nhắc lại = 1 nếu theo gói, 0 nếu lẻ - hoặc tùy logic App truyền vào)
+        -- B2: Thêm vào chi tiết (Sử dụng LieuLuong đã tính)
         INSERT INTO CT_TIEM_VC (MaVaccine, MaPhieu, NhacLai, LieuLuong, ThanhTien)
-        VALUES (@MaVaccine, @MaPhieu, @TheoGoi, N'Đặt qua App', @ThanhTien);
+        VALUES (@MaVaccine, @MaPhieu, @TheoGoi, @LieuLuongText, @ThanhTien);
 
         -- B3: Cập nhật hiệu lực gói (Nếu đây là mũi cuối cùng)
         IF @TheoGoi = 1
@@ -575,7 +601,9 @@ CREATE OR ALTER PROC sp_TaoPhieuTrucTiep
     @MaCN NCHAR(10),
     @MaNV NCHAR(10), 
     @LoaiPhieu VARCHAR(2), 
-    @TrieuChung NVARCHAR(200) = NULL
+    @TrieuChung NVARCHAR(200) = NULL,
+    @MaVaccine NCHAR(10) = NULL,  -- Vaccine lẻ (nếu có)
+    @MaGoi NCHAR(10) = NULL        -- Gói tiêm (nếu có)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -600,6 +628,35 @@ BEGIN
         BEGIN
             RAISERROR(N'Lỗi: Thú cưng này không tồn tại hoặc không thuộc về khách hàng đang chọn!', 16, 1);
             RETURN;
+        END
+    END
+    
+    -- Validate vaccine nếu là phiếu tiêm vaccine
+    IF @LoaiPhieu = 'TV'
+    BEGIN
+        -- Nếu chọn vaccine lẻ, kiểm tra tồn kho
+        IF @MaVaccine IS NOT NULL
+        BEGIN
+            DECLARE @TonKho INT;
+            SELECT @TonKho = SoLuongTon 
+            FROM TON_KHO 
+            WHERE MaCN = @MaCN AND MaMatHang = @MaVaccine;
+            
+            IF ISNULL(@TonKho, 0) < 1
+            BEGIN
+                RAISERROR(N'Lỗi: Vaccine đã hết hàng hoặc không tồn tại!', 16, 1);
+                RETURN;
+            END
+        END
+        
+        -- Nếu chọn gói tiêm, kiểm tra gói tồn tại
+        IF @MaGoi IS NOT NULL
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM GOI_TIEM_VC WHERE MaGoi = @MaGoi)
+            BEGIN
+                RAISERROR(N'Lỗi: Gói tiêm không tồn tại!', 16, 1);
+                RETURN;
+            END
         END
     END
 
@@ -768,37 +825,6 @@ BEGIN
     BEGIN
         RAISERROR(N'Lỗi: Phiếu Mua hàng phải do Nhân viên bán hàng phụ trách!', 16, 1);
         RETURN;
-    END
-
-    -- 1.4 🔥 KIỂM TRA GIỞ LÀM VIỆC
-    DECLARE @GioHienTai TIME = CAST(GETDATE() AS TIME);
-    DECLARE @GioMoCua TIME, @GioDongCua TIME;
-    
-    SELECT @GioMoCua = Giomocua, @GioDongCua = Giodongcua 
-    FROM CHI_NHANH 
-    WHERE MaCN = @MaCN_Phieu;
-
-    IF @GioHienTai < @GioMoCua OR @GioHienTai > @GioDongCua
-    BEGIN
-        RAISERROR(N'Lỗi: Hiện tại ngoài giờ làm việc của chi nhánh!', 16, 1);
-        RETURN;
-    END
-
-    -- 1.5 🔥 KIỂM TRA BÁC SĨ CÓ ĐANG BẬN KHÔNG (Nếu là KB/TV)
-    IF @LoaiPhieu IN ('KB', 'TV')
-    BEGIN
-        DECLARE @SoPhieuDangXuLy INT;
-        SELECT @SoPhieuDangXuLy = COUNT(*)
-        FROM PHIEU_DICH_VU
-        WHERE MaNV = @MaNV_PhuTrach 
-          AND TrangThai = 'DTH' -- Đang thực hiện
-          AND LoaiPhieu IN ('KB', 'TV');
-
-        IF @SoPhieuDangXuLy > 0
-        BEGIN
-            RAISERROR(N'Lỗi: Bác sĩ này đang bận với phiếu khác, vui lòng chọn bác sĩ khác!', 16, 1);
-            RETURN;
-        END
     END
 
     -- =============================================
@@ -1322,7 +1348,7 @@ BEGIN
         
         -- B4: Update trạng thái phiếu thành Hoàn Tất (HT)
         UPDATE PHIEU_DICH_VU 
-        SET TrangThai = 'DHT',
+        SET TrangThai = 'HT',
             TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian thanh toán
         WHERE MaPhieu = @MaPhieu;
 

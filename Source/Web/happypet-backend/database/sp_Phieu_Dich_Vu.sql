@@ -345,16 +345,42 @@ BEGIN
         SET @ThanhTien = 0; -- Free
     END
 
-    -- 3. THỰC THI
+    -- 3. TÍNH SỐ MŨI (Nếu theo gói thì tính, nếu lẻ thì để "1 liều")
+    DECLARE @LieuLuongText NVARCHAR(50);
+    
+    IF @TheoGoi = 1
+    BEGIN
+        -- Tính số mũi ĐÃ TIÊM (bao gồm lịch sử)
+        DECLARE @SoMuiDaTiem_Current INT;
+        SELECT @SoMuiDaTiem_Current = COUNT(*)
+        FROM CT_TIEM_VC CT
+        JOIN PHIEU_DICH_VU P ON CT.MaPhieu = P.MaPhieu
+        WHERE P.MaKH = (SELECT MaKH FROM PHIEU_DICH_VU WHERE MaPhieu = @MaPhieu)
+          AND CT.MaVaccine = @MaVaccine
+          AND P.TG_LapPhieu >= @NgayDangKyGoi;
+        
+        -- Mũi tiếp theo = số mũi đã tiêm + 1
+        DECLARE @SoMuiTiepTheo INT = ISNULL(@SoMuiDaTiem_Current, 0) + 1;
+        
+        -- Format: "Mũi 1/3", "Mũi 2/3"...
+        SET @LieuLuongText = N'Mũi ' + CAST(@SoMuiTiepTheo AS NVARCHAR(5)) + N'/' + CAST(@SoMuiQuyDinh AS NVARCHAR(5));
+    END
+    ELSE
+    BEGIN
+        -- Mua lẻ thì để text đơn giản
+        SET @LieuLuongText = N'1 liều';
+    END
+
+    -- 4. THỰC THI
     BEGIN TRANSACTION;
     BEGIN TRY
         -- B1: Trừ kho giữ chỗ
         UPDATE TON_KHO SET SoLuongTon = SoLuongTon - 1 
         WHERE MaCN = @MaCN AND MaMatHang = @MaVaccine;
 
-        -- B2: Thêm vào chi tiết (Nhắc lại = 1 nếu theo gói, 0 nếu lẻ - hoặc tùy logic App truyền vào)
+        -- B2: Thêm vào chi tiết (Sử dụng LieuLuong đã tính)
         INSERT INTO CT_TIEM_VC (MaVaccine, MaPhieu, NhacLai, LieuLuong, ThanhTien)
-        VALUES (@MaVaccine, @MaPhieu, @TheoGoi, N'Đặt qua App', @ThanhTien);
+        VALUES (@MaVaccine, @MaPhieu, @TheoGoi, @LieuLuongText, @ThanhTien);
 
         -- B3: Cập nhật hiệu lực gói (Nếu đây là mũi cuối cùng)
         IF @TheoGoi = 1
@@ -575,7 +601,9 @@ CREATE OR ALTER PROC sp_TaoPhieuTrucTiep
     @MaCN NCHAR(10),
     @MaNV NCHAR(10), 
     @LoaiPhieu VARCHAR(2), 
-    @TrieuChung NVARCHAR(200) = NULL
+    @TrieuChung NVARCHAR(200) = NULL,
+    @MaVaccine NCHAR(10) = NULL,  -- Vaccine lẻ (nếu có)
+    @MaGoi NCHAR(10) = NULL        -- Gói tiêm (nếu có)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -600,6 +628,35 @@ BEGIN
         BEGIN
             RAISERROR(N'Lỗi: Thú cưng này không tồn tại hoặc không thuộc về khách hàng đang chọn!', 16, 1);
             RETURN;
+        END
+    END
+    
+    -- Validate vaccine nếu là phiếu tiêm vaccine
+    IF @LoaiPhieu = 'TV'
+    BEGIN
+        -- Nếu chọn vaccine lẻ, kiểm tra tồn kho
+        IF @MaVaccine IS NOT NULL
+        BEGIN
+            DECLARE @TonKho INT;
+            SELECT @TonKho = SoLuongTon 
+            FROM TON_KHO 
+            WHERE MaCN = @MaCN AND MaMatHang = @MaVaccine;
+            
+            IF ISNULL(@TonKho, 0) < 1
+            BEGIN
+                RAISERROR(N'Lỗi: Vaccine đã hết hàng hoặc không tồn tại!', 16, 1);
+                RETURN;
+            END
+        END
+        
+        -- Nếu chọn gói tiêm, kiểm tra gói tồn tại
+        IF @MaGoi IS NOT NULL
+        BEGIN
+            IF NOT EXISTS (SELECT 1 FROM GOI_TIEM_VC WHERE MaGoi = @MaGoi)
+            BEGIN
+                RAISERROR(N'Lỗi: Gói tiêm không tồn tại!', 16, 1);
+                RETURN;
+            END
         END
     END
 
@@ -782,7 +839,8 @@ BEGIN
             TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian check-in thực tế
         WHERE MaPhieu = @MaPhieu;
 
-        -- 2.2 Tạo Hóa Đơn Trực Tiếp
+        -- 2.2 Tạo Hóa Đơn Trực Tiếp với MaNV = bác sĩ (chưa xuất)
+        -- Khi nhân viên tiếp tán xuất HD, sẽ UPDATE MaNV = nhân viên
         IF NOT EXISTS (SELECT 1 FROM HD_TRUC_TIEP WHERE MaPhieu = @MaPhieu)
         BEGIN
             INSERT INTO HD_TRUC_TIEP (
@@ -801,7 +859,7 @@ BEGIN
                 0, 
                 0, 
                 N'Tiền mặt', -- Mặc định
-                @MaNV_PhuTrach
+                @MaNV_PhuTrach -- 🔥 MaNV = bác sĩ (chưa xuất)
             );
         END
 
@@ -1130,6 +1188,14 @@ BEGIN
         SET TrangThai = 'DHT' -- Đã hoàn thành
         WHERE MaPhieu = @MaPhieu;
 
+        -- 🔥 TẠO HÓA ĐƠN TRỐNG (sẽ được fill khi xuất)
+        -- MaNV để NULL, sẽ được gán = nhân viên tiếp tán khi xuất hóa đơn
+        IF NOT EXISTS (SELECT 1 FROM HD_TRUC_TIEP WHERE MaPhieu = @MaPhieu)
+        BEGIN
+            INSERT INTO HD_TRUC_TIEP (MaPhieu, TongThanhTien, KhuyenMai, DiemQuyDoi, TongThanhTienSC, PhuongThucTT, MaNV)
+            VALUES (@MaPhieu, 0, 0, 0, 0, N'Tiền mặt', NULL); -- MaNV = NULL, chưa xuất
+        END
+
         -- PRINT N'Xác nhận hoàn tất dịch vụ.';
     END TRY
     BEGIN CATCH
@@ -1143,7 +1209,8 @@ GO
 CREATE OR ALTER PROCEDURE sp_XuatHoaDonTrucTiep
     @MaPhieu NCHAR(10),
     @DiemMuonDung INT = 0,        -- Số điểm khách muốn dùng để giảm giá
-    @PhuongThucTT NVARCHAR(50)
+    @PhuongThucTT NVARCHAR(50),
+    @MaNV_XuatHD NCHAR(10)        -- 🔥 NHÂN VIÊN TIẾP TÁN XUẤT HÓA ĐƠN
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1267,8 +1334,15 @@ BEGIN
             KhuyenMai = @TongKhuyenMai,
             DiemQuyDoi = @DiemMuonDung,
             TongThanhTienSC = @TongThanhToan,
-            PhuongThucTT = @PhuongThucTT
+            PhuongThucTT = @PhuongThucTT,
+            MaNV = @MaNV_XuatHD  -- 🔥 GÁN NHÂN VIÊN TIẾP TÁN XUẤT HÓA ĐƠN
         WHERE MaPhieu = @MaPhieu;
+        
+        IF @@ROWCOUNT = 0
+        BEGIN
+            RAISERROR(N'Lỗi: Không tìm thấy hóa đơn! Vui lòng hoàn tất phiếu trước.', 16, 1);
+            RETURN;
+        END
 
         -- B2: Trừ điểm tích lũy đã dùng
         IF @DiemMuonDung > 0
@@ -1289,10 +1363,10 @@ BEGIN
             WHERE MaKH = @MaKH;
         END
         
-        -- B4: Update trạng thái phiếu thành Hoàn Tất (HT)
+        -- B4: Update trạng thái phiếu (GIỮ NGUYÊN DHT - không đổi thành HT vì constraint)
+        -- Phiếu đã DHT rồi, chỉ cần cập nhật thời gian thanh toán
         UPDATE PHIEU_DICH_VU 
-        SET TrangThai = 'HT',
-            TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian thanh toán
+        SET TG_ThucHienDV = GETDATE()      -- Cập nhật thời gian thanh toán
         WHERE MaPhieu = @MaPhieu;
 
         COMMIT TRANSACTION;
@@ -1305,7 +1379,9 @@ BEGIN
             FORMAT(@TienGiamHangTV, 'N0', 'vi-VN') AS GiamHangTV,
             FORMAT(@TienGiamDiem, 'N0', 'vi-VN') AS GiamDiem,
             FORMAT(@TongThanhToan, 'N0', 'vi-VN') AS KhachCanTra,
-            @DiemCongThem AS DiemDuocCong;
+            @DiemCongThem AS DiemDuocCong,
+            @DiemHienCo AS DiemHienCoBanDau, -- Trả về điểm ban đầu để frontend biết
+            (@DiemHienCo - @DiemMuonDung + @DiemCongThem) AS DiemConLai; -- Điểm sau khi trừ và cộng
 
     END TRY
     BEGIN CATCH

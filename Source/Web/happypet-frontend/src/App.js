@@ -116,11 +116,16 @@ import RecheckReminder from './pages/customer/RecheckReminder';
 // Import trang nội bộ (Bác sĩ & Nhân viên) -> 🔥 NÃY BÀ THIẾU 2 DÒNG NÀY
 import DoctorDashboard from './pages/doctor/DoctorDashboard';
 import ExamDetail from './pages/doctor/ExamDetail';
+import VaccineDetail from './pages/doctor/VaccineDetail'; // 🔥 MỚI
+import Medicines from './pages/doctor/Medicines'; // 💊 Trang thuốc & vaccine
 import EmployeeDashboard from './pages/employee/EmployeeDashboard';
 import ServiceBookings from './pages/employee/ServiceBookings';
 import OrderManagement from './pages/employee/OrderManagement';
 import TestAutoHuy from './pages/employee/TestAutoHuy';
 import EmployeeRecheckReminder from './pages/employee/RecheckReminder'; // 🔥 MỚI
+import DirectSale from './pages/employee/DirectSale'; // 🔥 BÁN HÀNG TRỰC TIẾP
+import ManagerDashboard from './pages/manager/ManagerDashboard'; // 🔥 GIÁM ĐỐC (Dashboard đẹp)
+import BranchManagerDashboard from './pages/manager/BranchManagerDashboard'; // 🔥 QUẢN LÝ CHI NHÁNH
 
 function App() {
 
@@ -184,12 +189,25 @@ function App() {
               <Route path="/employee/orders" element={<OrderManagement />} />
               <Route path="/employee/test-auto-huy" element={<TestAutoHuy />} />
               <Route path="/employee/recheck-reminder" element={<EmployeeRecheckReminder />} />
+              <Route path="/employee/direct-sale" element={<DirectSale />} />
           </Route>
 
           {/* --- 🔥 KHU VỰC BÁC SĨ (QUAN TRỌNG) --- */}
           <Route element={<ProtectedRoute allowedRoles={['Bác sĩ', 'Bác sĩ thú y', 'Quản lý chi nhánh', 'BS']} />}>
               <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
               <Route path="/doctor/exam/:maPhieu" element={<ExamDetail />} />
+              <Route path="/doctor/vaccine/:maPhieu" element={<VaccineDetail />} />
+              <Route path="/doctor/medicines" element={<Medicines />} /> {/* 💊 Danh sách thuốc & vaccine */}
+          </Route>
+
+          {/* --- 🔥 KHU VỰC GIÁM ĐỐC (CHỈ GIÁM ĐỐC) --- */}
+          <Route element={<ProtectedRoute allowedRoles={['Giám đốc', 'Admin']} />}>
+              <Route path="/manager/dashboard" element={<ManagerDashboard />} />
+          </Route>
+
+          {/* --- 🔥 KHU VỰC QUẢN LÝ CHI NHÁNH --- */}
+          <Route element={<ProtectedRoute allowedRoles={['Quản lý chi nhánh', 'Admin']} />}>
+              <Route path="/branch-manager/dashboard" element={<BranchManagerDashboard />} />
           </Route>
 
       </Routes>

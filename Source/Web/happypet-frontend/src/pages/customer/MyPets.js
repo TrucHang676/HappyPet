@@ -3,24 +3,24 @@ import React, { useState, useEffect } from 'react';
 import axios from 'axios';
 import { FaPencilAlt, FaTimes, FaTrash, FaPlus, FaNotesMedical, FaSyringe, FaStethoscope } from 'react-icons/fa'; 
 import './MyPets.css'; 
-import Swal from 'sweetalert2'; // Đã import sẵn
+import Swal from 'sweetalert2'; 
 
 const MyPets = () => {
   const [pets, setPets] = useState([]);
   
-  // --- STATE SỬA (Edit) ---
+  // STATE SỬA
   const [isEditing, setIsEditing] = useState(false);
   const [editFormData, setEditFormData] = useState({
     MaTC: '', Ten: '', Loai: '', Giong: '', NgSinh: '', GioiTinh: '', TinhTrangSucKhoe: ''
   });
 
-  // --- STATE THÊM MỚI (Add) ---
+  // STATE THÊM MỚI
   const [isAdding, setIsAdding] = useState(false);
   const [addFormData, setAddFormData] = useState({
     Ten: '', Loai: 'Chó', Giong: '', NgSinh: '', GioiTinh: 'Đực', TinhTrangSucKhoe: ''
   });
 
-  // --- STATE CHO BỆNH ÁN ---
+  // STATE BỆNH ÁN
   const [isHistoryOpen, setIsHistoryOpen] = useState(false); 
   const [medicalData, setMedicalData] = useState({ khamBenh: [], tiemPhong: [] }); 
   const [activeTab, setActiveTab] = useState('kham'); 
@@ -43,7 +43,6 @@ const MyPets = () => {
     fetchPets();
   }, []);
 
-  // --- XỬ LÝ FORM THÊM MỚI ---
   const handleAddChange = (e) => {
     setAddFormData({ ...addFormData, [e.target.name]: e.target.value });
   };
@@ -55,19 +54,15 @@ const MyPets = () => {
         await axios.post('http://localhost:5000/api/pets/add', addFormData, {
             headers: { Authorization: `Bearer ${token}` }
         });
-
-        alert("Thêm thành công! 🎉"); // Giữ nguyên alert cũ theo ý bà
+        alert("Thêm thành công! 🎉"); 
         setIsAdding(false); 
         setAddFormData({ Ten: '', Loai: 'Chó', Giong: '', NgSinh: '', GioiTinh: 'Đực', TinhTrangSucKhoe: '' }); 
         fetchPets(); 
-
     } catch (error) {
-        console.error(error);
         alert("Lỗi khi thêm thú cưng!");
     }
   };
 
-  // --- XỬ LÝ FORM SỬA ---
   const handleEditClick = (pet) => {
     setIsEditing(true);
     const formattedDate = pet.NgSinh ? pet.NgSinh.toString().split('T')[0] : '';
@@ -95,7 +90,7 @@ const MyPets = () => {
             editFormData, 
             { headers: { Authorization: `Bearer ${token}` } }
         );
-        alert("Cập nhật thành công!"); // Giữ nguyên alert cũ
+        alert("Cập nhật thành công!"); 
         setIsEditing(false); 
         fetchPets();
     } catch (error) {
@@ -103,16 +98,15 @@ const MyPets = () => {
     }
   };
 
-
-  // --- 🔥 SỬA ĐOẠN NÀY: DÙNG SWEETALERT2 CHO XÓA 🔥 ---
   const handleDelete = (petId) => {
     Swal.fire({
-        title: 'Bạn có chắc chắn muốn xóa hay không?',
+        title: 'Bạn có chắc chắn muốn xóa không?',
+        text: "Hành động này không thể hoàn tác!",
         icon: 'warning',
         showCancelButton: true,
         confirmButtonColor: '#d33',
         cancelButtonColor: '#3085d6',
-        confirmButtonText: 'Xóa',
+        confirmButtonText: 'Xóa luôn',
         cancelButtonText: 'Hủy'
     }).then(async (result) => {
         if (result.isConfirmed) {
@@ -121,13 +115,7 @@ const MyPets = () => {
                 await axios.delete(`http://localhost:5000/api/pets/delete/${petId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
-                
-                // Hiện thông báo xóa thành công đẹp
-                Swal.fire(
-                    'Đã xóa!',
-                    'Bé đã bị xóa khỏi danh sách.',
-                    'success'
-                );
+                Swal.fire('Đã xóa!', 'Bé đã bị xóa khỏi danh sách.', 'success');
                 fetchPets(); 
             } catch (error) {
                 Swal.fire('Lỗi!', 'Không thể xóa, thử lại sau nhé.', 'error');
@@ -136,7 +124,6 @@ const MyPets = () => {
     });
   };
 
-  // --- HÀM GỌI API XEM HỒ SƠ ---
   const handleViewHistory = async (pet) => {
       setSelectedPetName(pet.Ten);
       setActiveTab('kham'); 
@@ -148,7 +135,7 @@ const MyPets = () => {
           setMedicalData(res.data); 
           setIsHistoryOpen(true); 
       } catch (error) {
-          alert("Không thể lấy dữ liệu hồ sơ! (Kiểm tra lại Backend)");
+          alert("Lỗi lấy dữ liệu hồ sơ!");
       }
   };
 
@@ -157,51 +144,51 @@ const MyPets = () => {
       <div className="header-section">
           <h2>Danh Sách Thú Cưng Của Tôi</h2>
           <button className="btn-add" onClick={() => setIsAdding(true)}>
-             <FaPlus style={{marginRight: '5px'}}/> Thêm Thú Cưng
+             <FaPlus style={{marginRight: '8px'}}/> Thêm Bé Mới
           </button>
       </div>
 
-      {/* DANH SÁCH THẺ PET */}
       <div className="pet-list">
-        {pets.length === 0 ? <p>Bạn chưa có thú cưng nào.</p> : pets.map((pet) => (
+        {pets.length === 0 ? <p className="empty-text">Bạn chưa có thú cưng nào. Thêm ngay nhé!</p> : pets.map((pet) => (
           <div key={pet.MaTC} className="pet-card">
-            <div className="edit-icon" onClick={() => handleEditClick(pet)}><FaPencilAlt /></div>
-            <div className="delete-icon" onClick={() => handleDelete(pet.MaTC)}><FaTrash /></div>
+            <div className="card-actions">
+                <div className="edit-icon" title="Sửa thông tin" onClick={() => handleEditClick(pet)}><FaPencilAlt /></div>
+                <div className="delete-icon" title="Xóa bé" onClick={() => handleDelete(pet.MaTC)}><FaTrash /></div>
+            </div>
 
             <div className="pet-icon">
-                {pet.Loai === 'Mèo' ? '🐱' : (pet.Loai === 'Chó' ? '🐶' : '🐾')}
+                {pet.Loai === 'Mèo' ? '🐱' : (pet.Loai === 'Chó' ? '🐶' : (pet.Loai === 'Chim' ? '🐦' : '🐾'))}
             </div>
+            
             <div className="pet-info">
                 <h3>{pet.Ten}</h3>
-                <p><strong>Loài:</strong> {pet.Loai}</p>
-                <p><strong>Giống:</strong> {pet.Giong}</p>
+                <p><strong>Giống:</strong> {pet.Loai} - {pet.Giong}</p>
                 <p><strong>Tuổi: </strong> 
                    {pet.TuoiNam > 0 ? `${pet.TuoiNam} tuổi ` : ''} {pet.TuoiThang} tháng
                 </p>
                 <p><strong>Ngày sinh:</strong> {pet.NgSinh?.split('T')[0]}</p>
                 <p><strong>Giới tính:</strong> <span className="gender-badge">{pet.GioiTinh}</span></p>
-                {pet.TinhTrangSucKhoe && <p style={{color: 'red', fontSize: '0.9em'}}>Status: {pet.TinhTrangSucKhoe}</p>}
+                {pet.TinhTrangSucKhoe && <p style={{color: '#e74c3c', fontSize: '0.9em', marginTop: '5px', fontWeight: 'bold'}}>❤️ {pet.TinhTrangSucKhoe}</p>}
             </div>
             
             <button className="btn-detail" onClick={() => handleViewHistory(pet)}>
-                <FaNotesMedical style={{marginRight: '5px'}}/> Xem hồ sơ
+                <FaNotesMedical /> Xem Hồ Sơ Bệnh Án
             </button>
           </div>
         ))}
       </div>
 
-      {/* --- MODAL THÊM MỚI --- */}
+      {/* MODAL THÊM MỚI */}
       {isAdding && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-                <h3>Thêm Thành Viên Mới 🐾</h3>
+                <h3>Thêm Thành Viên Mới 🐶</h3>
                 <FaTimes className="close-icon" onClick={() => setIsAdding(false)} />
             </div>
             <form onSubmit={handleAddSubmit}>
                 <label>Tên bé:</label>
                 <input type="text" name="Ten" value={addFormData.Ten} onChange={handleAddChange} required placeholder="Ví dụ: Milu" />
-
                 <div className="row-2-col">
                     <div>
                         <label>Loài:</label>
@@ -219,7 +206,6 @@ const MyPets = () => {
                         <input type="text" name="Giong" value={addFormData.Giong} onChange={handleAddChange} placeholder="Vd: Poodle"/>
                     </div>
                 </div>
-
                 <div className="row-2-col">
                     <div>
                         <label>Ngày sinh:</label>
@@ -233,10 +219,8 @@ const MyPets = () => {
                         </select>
                     </div>
                 </div>
-
                 <label>Tình trạng sức khỏe:</label>
-                <textarea name="TinhTrangSucKhoe" value={addFormData.TinhTrangSucKhoe} onChange={handleAddChange} rows="2" style={{width: '100%'}} placeholder="Bình thường..."></textarea>
-
+                <textarea name="TinhTrangSucKhoe" value={addFormData.TinhTrangSucKhoe} onChange={handleAddChange} rows="2" placeholder="Bình thường..."></textarea>
                 <div className="modal-actions">
                     <button type="button" className="btn-cancel" onClick={() => setIsAdding(false)}>Hủy</button>
                     <button type="submit" className="btn-save">Thêm Bé</button>
@@ -246,18 +230,17 @@ const MyPets = () => {
         </div>
       )}
 
-      {/* --- MODAL SỬA --- */}
+      {/* MODAL SỬA */}
       {isEditing && (
         <div className="modal-overlay">
           <div className="modal-content">
             <div className="modal-header">
-                <h3>Cập Nhật Hồ Sơ</h3>
+                <h3>Cập Nhật Hồ Sơ 📝</h3>
                 <FaTimes className="close-icon" onClick={() => setIsEditing(false)} />
             </div>
             <form onSubmit={handleSaveUpdate}>
                 <label>Tên bé:</label>
                 <input type="text" name="Ten" value={editFormData.Ten} onChange={handleEditChange} required />
-
                 <div className="row-2-col">
                     <div>
                         <label>Loài:</label>
@@ -275,7 +258,6 @@ const MyPets = () => {
                         <input type="text" name="Giong" value={editFormData.Giong} onChange={handleEditChange} />
                     </div>
                 </div>
-
                 <div className="row-2-col">
                     <div>
                         <label>Ngày sinh:</label>
@@ -289,10 +271,8 @@ const MyPets = () => {
                         </select>
                     </div>
                 </div>
-
                 <label>Tình trạng sức khỏe:</label>
-                <textarea name="TinhTrangSucKhoe" value={editFormData.TinhTrangSucKhoe} onChange={handleEditChange} rows="3" style={{width: '100%'}} />
-
+                <textarea name="TinhTrangSucKhoe" value={editFormData.TinhTrangSucKhoe} onChange={handleEditChange} rows="3" />
                 <div className="modal-actions">
                     <button type="button" className="btn-cancel" onClick={() => setIsEditing(false)}>Hủy</button>
                     <button type="submit" className="btn-save">Lưu Thay Đổi</button>
@@ -305,33 +285,50 @@ const MyPets = () => {
       {/* --- MODAL XEM HỒ SƠ --- */}
       {isHistoryOpen && (
         <div className="modal-overlay">
-          <div className="modal-content" style={{maxWidth: '800px'}}>
+          <div className="modal-content modal-lg">
             <div className="modal-header">
-                <h3>Hồ Sơ Y Tế: {selectedPetName} 🩺</h3>
+                <h3>Hồ Sơ Y Tế: <span style={{color: '#e67e22'}}>{selectedPetName}</span> 🩺</h3>
                 <FaTimes className="close-icon" onClick={() => setIsHistoryOpen(false)} />
             </div>
 
             <div className="tabs-container">
                 <button className={`tab-btn ${activeTab === 'kham' ? 'active' : ''}`} onClick={() => setActiveTab('kham')}>
-                    <FaStethoscope /> Lịch Sử Khám Bệnh
+                    <FaStethoscope /> Lịch Sử Khám
                 </button>
                 <button className={`tab-btn ${activeTab === 'tiem' ? 'active' : ''}`} onClick={() => setActiveTab('tiem')}>
-                    <FaSyringe /> Lịch Sử Tiêm Phòng
+                    <FaSyringe /> Lịch Sử Tiêm
                 </button>
             </div>
             
             <div className="history-table-container">
                 {activeTab === 'kham' && (
-                    medicalData.khamBenh.length === 0 ? <p className="empty-text">Chưa có lịch sử khám.</p> :
+                    medicalData.khamBenh.length === 0 ? <p className="empty-text">Bé khỏe re, chưa đi khám lần nào! 😎</p> :
                     <table className="history-table">
-                        <thead><tr><th>Ngày</th><th>Chẩn đoán</th><th>Triệu chứng</th><th>Bác sĩ</th><th>Nơi khám</th></tr></thead>
+                        <colgroup>
+                            <col style={{width: '15%'}} /> 
+                            <col style={{width: '25%'}} /> 
+                            <col style={{width: '30%'}} /> 
+                            <col style={{width: '15%'}} /> 
+                            <col style={{width: '15%'}} /> 
+                        </colgroup>
+                        <thead>
+                            <tr>
+                                <th>Ngày Khám</th>
+                                <th className="text-center">Chẩn đoán</th> {/* Căn giữa tiêu đề */}
+                                <th className="text-center">Triệu chứng</th> {/* Căn giữa tiêu đề */}
+                                <th>Bác sĩ</th>
+                                <th>Chi nhánh</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {medicalData.khamBenh.map((item, i) => (
                                 <tr key={i}>
-                                    <td>{item.NgayKham ? new Date(item.NgayKham).toLocaleDateString('vi-VN') : ''}</td>
-                                    <td style={{color:'#d32f2f', fontWeight:'bold'}}>{item.ChanDoan}</td>
-                                    <td>{item.TrieuChung}</td>
-                                    <td>{item.BacSiKham}</td>
+                                    <td className="col-date">{item.NgayKham ? new Date(item.NgayKham).toLocaleDateString('vi-VN') : ''}</td>
+                                    <td className="text-center"> {/* Căn giữa nội dung */}
+                                        <span className="status-bad-cell">{item.ChanDoan}</span>
+                                    </td>
+                                    <td className="text-muted text-center">{item.TrieuChung}</td> {/* Căn giữa nội dung */}
+                                    <td style={{fontWeight: '600'}}>{item.BacSiKham}</td>
                                     <td>{item.NoiKham}</td>
                                 </tr>
                             ))}
@@ -340,17 +337,34 @@ const MyPets = () => {
                 )}
 
                 {activeTab === 'tiem' && (
-                    medicalData.tiemPhong.length === 0 ? <p className="empty-text">Chưa có lịch sử tiêm.</p> :
+                    medicalData.tiemPhong.length === 0 ? <p className="empty-text">Chưa tiêm mũi nào lun? Đi tiêm ngay đi! 💉</p> :
                     <table className="history-table">
-                        <thead><tr><th>Ngày</th><th>Vaccine</th><th>Liều</th><th>Nhắc lại</th><th>Người tiêm</th></tr></thead>
+                        <colgroup>
+                            <col style={{width: '15%'}} /> 
+                            <col style={{width: '30%'}} /> 
+                            <col style={{width: '10%'}} /> 
+                            <col style={{width: '15%'}} /> 
+                            <col style={{width: '30%'}} /> 
+                        </colgroup>
+                        <thead style={{backgroundColor: '#e8f5e9'}}>
+                            <tr>
+                                <th style={{color: '#2e7d32'}}>Ngày Tiêm</th>
+                                <th className="text-center" style={{color: '#2e7d32'}}>Tên Vaccine</th> {/* Căn giữa tiêu đề */}
+                                <th className="text-center" style={{color: '#2e7d32'}}>Liều</th>
+                                <th className="text-center" style={{color: '#2e7d32'}}>Nhắc lại</th>
+                                <th style={{color: '#2e7d32'}}>Người tiêm</th>
+                            </tr>
+                        </thead>
                         <tbody>
                             {medicalData.tiemPhong.map((item, i) => (
                                 <tr key={i}>
-                                    <td>{item.NgayTiem ? new Date(item.NgayTiem).toLocaleDateString('vi-VN') : ''}</td>
-                                    <td style={{color:'#28a745', fontWeight:'bold'}}>{item.TenVaccine}</td>
-                                    <td>{item.LieuLuong}</td>
-                                    <td>{item.CanNhacLai}</td>
-                                    <td>{item.NguoiTiem}</td>
+                                    <td className="col-date">{item.NgayTiem ? new Date(item.NgayTiem).toLocaleDateString('vi-VN') : ''}</td>
+                                    <td className="text-center"> {/* Căn giữa nội dung */}
+                                        <span className="status-good-cell">{item.TenVaccine}</span>
+                                    </td>
+                                    <td className="text-center">{item.LieuLuong}</td>
+                                    <td className="text-center">{item.CanNhacLai}</td>
+                                    <td style={{fontWeight: '600'}}>{item.NguoiTiem}</td>
                                 </tr>
                             ))}
                         </tbody>

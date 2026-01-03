@@ -19,6 +19,10 @@ router.get('/my-pets', verifyToken, petController.getMyPets);
 // Đường dẫn thực tế: POST http://localhost:5000/api/pets/add
 router.post('/add', verifyToken, petController.addPet);
 
+// API 5: Kiểm tra gói vaccine đang tiêm dở
+// Đường dẫn thực tế: GET http://localhost:5000/api/pets/check-ongoing-vaccine/:MaTC
+router.get('/check-ongoing-vaccine/:MaTC', verifyToken, petController.checkOngoingVaccinePackage);
+
 // API 3: Xem lịch sử khám bệnh (Gọi SP 9)
 // Đường dẫn thực tế: GET http://localhost:5000/api/pets/TC000001/medical
 // :id là cái mã thú cưng nó sẽ thay đổi tùy con bà bấm vào

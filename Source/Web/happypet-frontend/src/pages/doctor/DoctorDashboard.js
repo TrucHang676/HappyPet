@@ -55,19 +55,21 @@ const DoctorDashboard = () => {
                             <div className="card-header">
                                 <div className="pet-info">
                                     <h3>🐾 {item.TenThuCung}</h3>
-                                    <span className="pet-breed">{item.LoaiThuCung} • {item.GiongThuCung}</span>
+                                    <span className="pet-breed">{item.LoaiThuCung}</span>
                                 </div>
-                                <span className="status-badge waiting">Chờ khám</span>
+                                <span className={`status-badge ${item.DichVu === 'Khám bệnh' ? 'exam' : 'vaccine'}`}>
+                                    {item.DichVu === 'Khám bệnh' ? '🩺 Khám bệnh' : '💉 Tiêm vaccine'}
+                                </span>
                             </div>
                             
                             <div className="card-body">
                                 <div className="info-row">
                                     <span className="label">👤 Chủ nuôi:</span>
-                                    <span className="value">{item.TenKhachHang}</span>
+                                    <span className="value">{item.ChuNuoi}</span>
                                 </div>
                                 <div className="info-row">
                                     <span className="label">🕒 Thời gian:</span>
-                                    <span className="value">{dayjs(item.TG_LapPhieu).format('HH:mm - DD/MM/YYYY')}</span>
+                                    <span className="value">{item.ThoiGianDisplay || dayjs(item.ThoiGian).format('HH:mm - DD/MM/YYYY')}</span>
                                 </div>
                                 <div className="info-row">
                                     <span className="label">🆔 Mã phiếu:</span>
@@ -78,9 +80,19 @@ const DoctorDashboard = () => {
                             <div className="card-footer">
                                 <button 
                                     className="btn-start-exam" 
-                                    onClick={() => navigate(`/doctor/exam/${item.MaPhieu}`)}
+                                    onClick={() => {
+                                        // 🔥 PHÂN BIỆT: Khám bệnh vs Tiêm vaccine
+                                        if (item.DichVu === 'Khám bệnh') {
+                                            navigate(`/doctor/exam/${item.MaPhieu}`);
+                                        } else {
+                                            navigate(`/doctor/vaccine/${item.MaPhieu}`);
+                                        }
+                                    }}
+                                    style={{
+                                        background: item.DichVu === 'Khám bệnh' ? '#2196f3' : '#4caf50'
+                                    }}
                                 >
-                                    🩺 Bắt đầu khám
+                                    {item.DichVu === 'Khám bệnh' ? '🩺 Bắt đầu khám' : '💉 Bắt đầu tiêm'}
                                 </button>
                             </div>
                         </div>

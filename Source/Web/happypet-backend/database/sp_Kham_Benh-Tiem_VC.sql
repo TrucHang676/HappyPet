@@ -211,6 +211,7 @@ CREATE OR ALTER PROC sp_BacSi_KetThucKham
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON;
 
     -- 1. VALIDATION
     -- Chỉ được kết thúc khi phiếu đang ở trạng thái 'DTH' (Đang thực hiện)
@@ -220,14 +221,32 @@ BEGIN
         RETURN;
     END
 
-    -- 2. UPDATE TRẠNG THÁI
+    -- 2. TÍNH TỔNG TIỀN TỪ ĐƠN THUỐC
+    DECLARE @TongTienThuoc DECIMAL(18,2);
+    
+    SELECT @TongTienThuoc = ISNULL(SUM(ThanhTien), 0)
+    FROM CT_DON_THUOC
+    WHERE MaPhieu = @MaPhieu;
+
+    -- 3. UPDATE TRẠNG THÁI (HD_TRUC_TIEP đã được tạo lúc check-in)
+    BEGIN TRANSACTION;
     BEGIN TRY
+        -- A. Update trạng thái phiếu
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DHT',         -- Đánh dấu là Đã Hoàn Thành (về mặt chuyên môn)
             TG_ThucHienDV = GETDATE()  -- 🔥 GHI ĐÈ = thời gian hoàn thành khám
         WHERE MaPhieu = @MaPhieu;
+        
+        -- B. Update tổng tiền vào hóa đơn (đã tồn tại từ lúc check-in)
+        UPDATE HD_TRUC_TIEP
+        SET TongThanhTien = @TongTienThuoc,
+            TongThanhTienSC = @TongTienThuoc  -- Tổng sau chiết khấu = tổng tiền (chưa có khuyến mãi)
+        WHERE MaPhieu = @MaPhieu;
+        
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         DECLARE @Err NVARCHAR(2000) = ERROR_MESSAGE();
         RAISERROR(@Err, 16, 1);
     END CATCH
@@ -299,8 +318,9 @@ BEGIN
         VALUES (@MaPhieu, @MaVaccine, @MaGoi, @NgayHetHan, 1, @ThanhTienGoi);
 
         -- B3: Insert vào Chi Tiết Tiêm (Mũi 1)
+        -- 🔥 MŨI 1 TRẢ TIỀN GÓI, từ mũi 2 trở đi mới miễn phí
         INSERT INTO CT_TIEM_VC (MaVaccine, MaPhieu, NhacLai, LieuLuong, ThanhTien)
-        VALUES (@MaVaccine, @MaPhieu, 0, N'1 liều (Mũi 1 theo gói)', @ThanhTienGoi);
+        VALUES (@MaVaccine, @MaPhieu, 0, N'Mũi 1/'+CAST(@SoMuiTuongUng AS NVARCHAR(5)), @ThanhTienGoi);
 
         COMMIT TRANSACTION;
     END TRY
@@ -616,14 +636,28 @@ BEGIN
         RETURN;
     END
 
+    -- 🔥 TÍNH TỔNG TIỀN TỪ VACCINE
+    DECLARE @TongTienVaccine DECIMAL(18,2);
+    
+    SELECT @TongTienVaccine = ISNULL(SUM(ThanhTien), 0)
+    FROM CT_TIEM_VC
+    WHERE MaPhieu = @MaPhieu;
+
+    BEGIN TRANSACTION;
     BEGIN TRY
+        -- A. Update trạng thái phiếu
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DHT',         -- Đã hoàn tất (Chờ thanh toán)
             TG_ThucHienDV = GETDATE()  -- 🔥 GHI ĐÈ = thời gian hoàn thành tiêm
         WHERE MaPhieu = @MaPhieu;
         
+        -- 🔥 KHÔNG CẬP NHẬT HÓA ĐƠN NỮA!
+        -- Hóa đơn sẽ được TẠO MỚI khi nhân viên xuất hóa đơn
+        
+        COMMIT TRANSACTION;
     END TRY
     BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         DECLARE @Err NVARCHAR(2000) = ERROR_MESSAGE();
         RAISERROR(@Err, 16, 1);
     END CATCH

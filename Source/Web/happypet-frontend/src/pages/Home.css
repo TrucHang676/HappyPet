@@ -1,0 +1,239 @@
+/* Import font chữ tròn trịa dễ thương từ Google Fonts */
+@import url('https://fonts.googleapis.com/css2?family=Quicksand:wght@400;600;700;800&display=swap');
+
+.home-container {
+    font-family: 'Quicksand', sans-serif; /* Font chữ toàn trang */
+    background-color: #fdfdfd;
+    overflow-x: hidden;
+}
+
+/* --- 1. HERO SECTION (BANNER CONG) --- */
+.hero-wrapper {
+    position: relative;
+    /* Gradient cam chéo sang trọng */
+    background: linear-gradient(135deg, #ff9f43 0%, #ff6b6b 100%);
+    padding: 80px 20px 150px 20px;
+    text-align: center;
+    color: white;
+    /* Tạo đường cong lồi xuống dưới */
+    border-radius: 0 0 50% 50% / 0 0 40px 40px; 
+    box-shadow: 0 10px 30px rgba(255, 107, 107, 0.2);
+    overflow: hidden; /* Ẩn các phần con vật bị thừa ra ngoài */
+}
+
+.hero-content {
+    max-width: 800px;
+    margin: 0 auto;
+    position: relative;
+    z-index: 2; /* Đảm bảo nội dung nằm trên các con vật */
+}
+
+.hero-badge {
+    background: rgba(255, 255, 255, 0.2);
+    padding: 5px 15px;
+    border-radius: 20px;
+    font-size: 0.9rem;
+    font-weight: 600;
+    letter-spacing: 1px;
+    display: inline-block;
+    margin-bottom: 15px;
+    backdrop-filter: blur(5px);
+    border: 1px solid rgba(255,255,255,0.3);
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 800;
+    margin: 0 0 15px 0;
+    line-height: 1.1;
+    text-shadow: 0 4px 10px rgba(0,0,0,0.1);
+}
+
+.hero-subtitle {
+    font-size: 1.2rem;
+    opacity: 0.95;
+    margin-bottom: 30px;
+    font-weight: 500;
+}
+
+/* --- NÚT ĐẶT LỊCH (ĐÃ SỬA FONT) --- */
+.cta-button {
+    background: white;
+    color: #ff6b6b;
+    padding: 15px 40px;
+    font-size: 1.1rem;
+    font-weight: 800;
+    /* THÊM DÒNG NÀY ĐỂ SỬA LỖI FONT */
+    font-family: 'Quicksand', sans-serif; 
+    border: none;
+    border-radius: 50px;
+    cursor: pointer;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.2);
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+}
+
+.cta-button:hover {
+    transform: translateY(-3px) scale(1.05);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+    background-color: #fff0f0;
+}
+
+/* --- ẢNH TRANG TRÍ THÚ CƯNG (MỚI) --- */
+.hero-deco-img {
+    position: absolute;
+    pointer-events: none; /* Để không che nút bấm */
+    z-index: 1;
+}
+
+/* Định vị từng con vật */
+.deco-dog-left {
+    height: 160px;
+    left: 5%;
+    bottom: 0;
+}
+
+.deco-cat {
+    height: 130px;
+    left: 22%;
+    bottom: 10px;
+    transform: rotate(-10deg);
+}
+
+.deco-hamster {
+    height: 80px;
+    right: 28%;
+    bottom: 5px;
+}
+
+.deco-bird {
+    height: 70px;
+    right: 18%;
+    top: 25%; /* Chim bay ở trên cao */
+    transform: rotate(15deg);
+}
+
+.deco-dog-right {
+    height: 190px;
+    right: 2%;
+    bottom: 0;
+}
+
+
+/* --- 2. FLOATING SERVICES (THẺ NỔI) --- */
+.floating-services {
+    display: flex;
+    justify-content: center;
+    gap: 40px;
+    margin-top: -80px;
+    padding: 0 20px;
+    position: relative;
+    z-index: 5;
+    flex-wrap: wrap;
+}
+
+.service-card {
+    background: white;
+    width: 180px;
+    height: 200px;
+    border-radius: 25px;
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    justify-content: center;
+    box-shadow: 0 15px 35px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    cursor: pointer;
+    border: 2px solid transparent;
+}
+
+.service-card:hover {
+    transform: translateY(-10px);
+    border-color: #ff9f43;
+    box-shadow: 0 20px 40px rgba(255, 159, 67, 0.15);
+}
+
+.icon-box {
+    width: 80px;
+    height: 80px;
+    background: linear-gradient(135deg, #fff5e6 0%, #ffeaa7 100%);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 38px;
+    margin-bottom: 20px;
+    color: #ff9f43;
+    box-shadow: 0 5px 15px rgba(255, 159, 67, 0.1);
+}
+
+.service-card h3 {
+    font-size: 1.1rem;
+    color: #444;
+    font-weight: 700;
+    margin: 0;
+}
+
+/* --- 3. PROMOTION SECTION --- */
+.promo-section {
+    padding: 80px 10%;
+    text-align: center;
+}
+
+.section-title {
+    font-size: 2rem;
+    color: #2d3436;
+    margin-bottom: 40px;
+    font-weight: 800;
+}
+.highlight { color: #ff6b6b; }
+
+.promo-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(300px, 1fr));
+    gap: 30px;
+}
+
+.promo-item {
+    position: relative;
+    border-radius: 20px;
+    overflow: hidden;
+    height: 250px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    group: hover;
+}
+
+.promo-item img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.5s;
+}
+
+.promo-item:hover img {
+    transform: scale(1.1);
+}
+
+.promo-overlay {
+    position: absolute;
+    bottom: 0; left: 0; right: 0;
+    background: linear-gradient(to top, rgba(0,0,0,0.8), transparent);
+    padding: 20px;
+    color: white;
+    text-align: left;
+}
+
+/* Responsive Mobile */
+@media (max-width: 768px) {
+    .hero-title { font-size: 2.5rem; }
+    /* Ẩn bớt con vật trên mobile cho đỡ rối */
+    .deco-cat, .deco-hamster, .deco-bird { display: none; } 
+    .deco-dog-left { height: 120px; left: -20px; }
+    .deco-dog-right { height: 150px; right: -20px; }
+    
+    .floating-services { gap: 15px; }
+    .service-card { width: 45%; height: 160px; }
+}

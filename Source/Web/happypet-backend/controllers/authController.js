@@ -178,6 +178,7 @@ exports.login = async (req, res) => {
         let finalMaCN = user.MaCN;
 
         // Nếu là NV, tui sẽ Query thêm 1 phát nữa vào bảng NHAN_VIEN để lấy chính xác ChucVu
+        let chucVuCuThe = null; // 🔥 THÊM BIẾN NÀY
         if (user.LoaiUser === 'NV') {
             const staffReq = pool.request().input('MaNV', sql.VarChar(20), user.MaUser);
             const staffRes = await staffReq.query("SELECT Chucvu, MaCN FROM NHAN_VIEN WHERE MaNV = @MaNV");
@@ -185,14 +186,20 @@ exports.login = async (req, res) => {
             if (staffRes.recordset.length > 0) {
                 // Đây rồi! Lấy đúng cái "Bác sĩ" hoặc "Bác sĩ thú y" ra
                 finalRole = staffRes.recordset[0].Chucvu; 
+                chucVuCuThe = staffRes.recordset[0].Chucvu; // 🔥 LẤY CHỨC VỤ (CỘT TÊN LÀ Chucvu)
                 finalMaCN = staffRes.recordset[0].MaCN;
-                console.log("✅ Đã tìm thấy chức vụ cụ thể:", finalRole);
+                console.log("✅ Đã tìm thấy chức vụ cụ thể:", finalRole, "- ChucVuCuThe:", chucVuCuThe);
             }
         }
 
         // 4. Tạo Token với Role chuẩn vừa tìm được
         const token = jwt.sign(
-            { MaUser: user.MaUser, Role: finalRole, MaCN: finalMaCN }, 
+            { 
+                MaUser: user.MaUser, 
+                Role: finalRole, 
+                MaCN: finalMaCN,
+                ChucVuCuThe: chucVuCuThe // 🔥 THÊM CHỨC VỤ CỤ THỂ VÀO TOKEN
+            }, 
             process.env.JWT_SECRET || 'toimuontoitetlamroichoioiii!!', 
             { expiresIn: '1d' }
         );
@@ -203,11 +210,14 @@ exports.login = async (req, res) => {
             token: token,
             HoTen: user.HoTen,
             Role: finalRole, // Cái này để code cũ của bà bắt được nè
+            ChucVuCuThe: chucVuCuThe, // 🔥 TRẢ VỀ CHỨC VỤ CỤ THỂ
             MaUser: user.MaUser,
+            MaCN: finalMaCN,
             user: { // Cái này để code mới bắt được (nếu có dùng)
                 MaUser: user.MaUser,
                 HoTen: user.HoTen,
                 role: finalRole, // 🔥 QUAN TRỌNG: Trả về "Bác sĩ" tại đây
+                ChucVuCuThe: chucVuCuThe, // 🔥 THÊM VÀO USER OBJECT
                 MaCN: finalMaCN,
                 Avatar: user.Avatar || ''
             }

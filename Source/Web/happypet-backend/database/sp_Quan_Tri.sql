@@ -171,7 +171,8 @@ GO
 -- 5. Thống kê doanh thu bán sản phẩm
 CREATE OR ALTER PROC sp_ThongKeDoanhThuSanPham
     @TuNgay DATE,
-    @DenNgay DATE
+    @DenNgay DATE,
+    @MaCN NCHAR(10) = NULL -- NULL = tất cả chi nhánh (Director), có giá trị = chi nhánh cụ thể (Branch Manager)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -186,6 +187,7 @@ BEGIN
     JOIN MAT_HANG M ON MH.MaMatHang = M.MaMatHang
     WHERE P.TG_ThucHienDV BETWEEN @TuNgay AND @DenNgay
       AND P.TrangThai = 'DHT'
+      AND (@MaCN IS NULL OR P.MaCN = @MaCN)
     GROUP BY MH.MaMatHang, M.TenMatHang
     ORDER BY TongDoanhThu DESC;
 END;
@@ -234,7 +236,8 @@ GO
 
 -- 7. Thống kê các nhân viên có điểm đánh giá >= x
 CREATE OR ALTER PROC sp_ThongKeNhanVienGioi
-    @DiemSan DECIMAL(4,2)
+    @DiemSan DECIMAL(4,2),
+    @MaCN NCHAR(10) = NULL -- NULL = tất cả chi nhánh (Director)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -250,6 +253,7 @@ BEGIN
     JOIN PHIEU_DICH_VU P ON NV.MaNV = P.MaNV
     JOIN DANH_GIA_DV DG ON P.MaPhieu = DG.MaPhieu
     JOIN CHI_NHANH CN ON NV.MaCN = CN.MaCN
+    WHERE (@MaCN IS NULL OR NV.MaCN = @MaCN)
     GROUP BY NV.MaNV, U.HoTen, CN.TenCN
     HAVING AVG(DG.DiemThaiDoNV) >= @DiemSan
     ORDER BY DiemTrungBinh DESC;
@@ -299,6 +303,7 @@ GO
 
 -- 10. Dịch vụ mang lại doanh thu cao nhất trong 6 tháng vừa qua
 CREATE OR ALTER PROC sp_TopDichVuDoanhThu
+    @MaCN NCHAR(10) = NULL -- NULL = tất cả chi nhánh (Director)
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -316,6 +321,7 @@ BEGIN
     JOIN HD_TRUC_TIEP HD ON P.MaPhieu = HD.MaPhieu
     WHERE P.TG_ThucHienDV >= @NgayBatDau
       AND P.TrangThai = 'DHT'
+      AND (@MaCN IS NULL OR P.MaCN = @MaCN)
     GROUP BY P.LoaiPhieu
     ORDER BY TongDoanhThu DESC;
 END;
@@ -323,19 +329,40 @@ GO
 
 -- 11. Thống kê tình hình hội viên
 CREATE OR ALTER PROC sp_ThongKeHoiVien
-    @Nam INT
+    @Nam INT,
+    @MaCN NCHAR(10) = NULL -- NULL = tất cả chi nhánh (Director), có giá trị = khách hàng của chi nhánh đó
 AS
 BEGIN
     SET NOCOUNT ON;
 
-    SELECT 
-        H.TenHang,
-        H.KhuyenMaiUuTien AS PhanTramGiamGia,
-        COUNT(XH.MaKH) AS SoLuongKhach
-    FROM HANG_TV H
-    LEFT JOIN XEP_HANG_NAM XH ON H.MaHang = XH.MaHang AND XH.Nam = @Nam
-    GROUP BY H.MaHang, H.TenHang, H.KhuyenMaiUuTien
-    ORDER BY H.KhuyenMaiUuTien ASC;
+    -- Nếu @MaCN NULL: Đếm tất cả khách hàng
+    -- Nếu @MaCN có giá trị: Chỉ đếm khách hàng đã từng đến chi nhánh đó
+    IF @MaCN IS NULL
+    BEGIN
+        -- Director: Đếm tất cả khách hàng
+        SELECT 
+            H.TenHang,
+            H.KhuyenMaiUuTien AS PhanTramGiamGia,
+            COUNT(XH.MaKH) AS SoLuongKhach
+        FROM HANG_TV H
+        LEFT JOIN XEP_HANG_NAM XH ON H.MaHang = XH.MaHang AND XH.Nam = @Nam
+        GROUP BY H.MaHang, H.TenHang, H.KhuyenMaiUuTien
+        ORDER BY H.KhuyenMaiUuTien ASC;
+    END
+    ELSE
+    BEGIN
+        -- Branch Manager: Chỉ đếm khách đã đến chi nhánh
+        SELECT 
+            H.TenHang,
+            H.KhuyenMaiUuTien AS PhanTramGiamGia,
+            COUNT(DISTINCT XH.MaKH) AS SoLuongKhach
+        FROM HANG_TV H
+        LEFT JOIN XEP_HANG_NAM XH ON H.MaHang = XH.MaHang AND XH.Nam = @Nam
+        LEFT JOIN PHIEU_DICH_VU P ON XH.MaKH = P.MaKH AND P.MaCN = @MaCN AND P.TrangThai = 'DHT'
+        WHERE XH.MaKH IS NULL OR P.MaPhieu IS NOT NULL
+        GROUP BY H.MaHang, H.TenHang, H.KhuyenMaiUuTien
+        ORDER BY H.KhuyenMaiUuTien ASC;
+    END
 END;
 GO
 
