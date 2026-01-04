@@ -94,7 +94,7 @@ const History = () => {
         if (!window.confirm("Xác nhận bạn đã nhận hàng?")) return;
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/orders/confirm-received', 
+            await axios.post('https://happy-pet-fomc.onrender.com/api/orders/confirm-received', 
                 { MaPhieu: maPhieu }, 
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -182,7 +182,7 @@ const History = () => {
     const handleReviewSubmit = async (reviewData) => {
         try {
             const token = localStorage.getItem('token'); 
-            const endpoint = reviewModal.type === 'SERVICE' ? 'http://localhost:5000/api/reviews/service' : 'http://localhost:5000/api/reviews/product';
+            const endpoint = reviewModal.type === 'SERVICE' ? 'https://happy-pet-fomc.onrender.com/api/reviews/service' : 'https://happy-pet-fomc.onrender.com/api/reviews/product';
             await axios.post(endpoint, reviewData, { headers: { Authorization: `Bearer ${token}` } });
             alert('Cảm ơn bạn đã đánh giá!'); 
             setReviewModal(null);

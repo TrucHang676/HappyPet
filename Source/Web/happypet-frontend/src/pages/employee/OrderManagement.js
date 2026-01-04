@@ -77,7 +77,7 @@ const OrderManagement = () => {
             const { tuNgay, denNgay } = getDateRange(timeTab);
             console.log('📅 DATE RANGE:', tuNgay, '->', denNgay);
 
-            const res = await axios.get('http://localhost:5000/api/employee/appointments', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/employee/appointments', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: 'ALL', tuNgay, denNgay }
             });
@@ -121,9 +121,9 @@ const OrderManagement = () => {
         try {
             const token = localStorage.getItem('token');
             const maPhieu = order.MaPhieu.trim(); // Trim để bỏ khoảng trắng
-            console.log('🔍 Calling API:', `http://localhost:5000/api/employee/order-detail/${maPhieu}`);
+            console.log('🔍 Calling API:', `https://happy-pet-fomc.onrender.com/api/employee/order-detail/${maPhieu}`);
             
-            const res = await axios.get(`http://localhost:5000/api/employee/order-detail/${maPhieu}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/employee/order-detail/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -164,7 +164,7 @@ const OrderManagement = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/employee/confirm-delivery', { MaPhieu: maPhieu }, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post('https://happy-pet-fomc.onrender.com/api/employee/confirm-delivery', { MaPhieu: maPhieu }, { headers: { Authorization: `Bearer ${token}` } });
             Swal.fire('Thành công', 'Đơn hàng đã hoàn tất!', 'success');
             fetchOrders();
         } catch (error) {

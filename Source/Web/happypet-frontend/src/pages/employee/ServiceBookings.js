@@ -113,7 +113,7 @@ const ServiceBookings = () => {
             const token = localStorage.getItem('token');
             const { tuNgay, denNgay } = getDateRange(timeTab);
 
-            const res = await axios.get('http://localhost:5000/api/employee/appointments', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/employee/appointments', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { status: 'ALL', tuNgay, denNgay }
             });
@@ -131,7 +131,7 @@ const ServiceBookings = () => {
     const fetchDoctors = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/employee/doctors-status', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/employee/doctors-status', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setDoctors(res.data);
@@ -186,7 +186,7 @@ const ServiceBookings = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/employee/check-in', 
+            await axios.put('https://happy-pet-fomc.onrender.com/api/employee/check-in', 
                 { MaPhieu: currentTicket.MaPhieu, MaBacSi: selectedDoctor },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -208,23 +208,29 @@ const ServiceBookings = () => {
         setShowInvoiceModal(true);
         setLoading(true);
         
-        // Fetch điểm tích lũy của khách qua API backend
+        // 🔥 LẤY ĐIỂM TÍCH LŨY TỪ DATABASE (qua backend)
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/api/employee/export-invoice', {
-                MaPhieu: ticket.MaPhieu,
-                DiemMuonDung: 0, // Chỉ để lấy thông tin, chưa xuất thật
-                PhuongThucTT: 'Tiền mặt'
-            }, {
+            const maKH = ticket.MaKH;
+            
+            if (!maKH) {
+                console.warn('Ticket không có MaKH:', ticket);
+                setInvoiceData({ DiemMuonDung: 0, PhuongThucTT: 'Tiền mặt', DiemHienCo: 0 });
+                return;
+            }
+            
+            // Gọi query trực tiếp để lấy điểm (backend sẽ query database)
+            const response = await axios.get(`https://happy-pet-fomc.onrender.com/api/employee/customer-points/${maKH}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
-            // Lấy điểm từ response (nếu có)
-            const diemHienCo = response.data.invoice?.DiemHienCoBanDau || 0;
+            const diemHienCo = response.data?.TongDiemTichLuy || 0;
+            console.log(`✅ Điểm tích lũy của KH ${maKH}: ${diemHienCo}`);
+            
             setInvoiceData({ DiemMuonDung: 0, PhuongThucTT: 'Tiền mặt', DiemHienCo: diemHienCo });
             setInvoiceResult(null);
         } catch (error) {
-            console.error('Lỗi lấy thông tin:', error);
+            console.error('❌ Lỗi lấy điểm tích lũy:', error);
             setInvoiceData({ DiemMuonDung: 0, PhuongThucTT: 'Tiền mặt', DiemHienCo: 0 });
         } finally {
             setLoading(false);
@@ -235,7 +241,7 @@ const ServiceBookings = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const response = await axios.post('http://localhost:5000/api/employee/export-invoice', {
+            const response = await axios.post('https://happy-pet-fomc.onrender.com/api/employee/export-invoice', {
                 MaPhieu: currentInvoiceTicket.MaPhieu,
                 DiemMuonDung: parseInt(invoiceData.DiemMuonDung) || 0,
                 PhuongThucTT: invoiceData.PhuongThucTT
@@ -299,7 +305,7 @@ const ServiceBookings = () => {
         setIsSearching(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/employee/search-customer?sdt=${phoneSearch}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/employee/search-customer?sdt=${phoneSearch}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -318,7 +324,7 @@ const ServiceBookings = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/employee/walk-in', walkInData, {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/employee/walk-in', walkInData, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -367,7 +373,7 @@ const ServiceBookings = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('http://localhost:5000/api/employee/walk-in-full', payload, {
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/employee/walk-in-full', payload, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             

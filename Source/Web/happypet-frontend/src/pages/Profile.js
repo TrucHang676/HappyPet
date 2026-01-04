@@ -27,7 +27,7 @@ const Profile = () => {
     const fetchProfile = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/users/profile', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/users/profile', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -102,7 +102,7 @@ const Profile = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.put('http://localhost:5000/api/users/profile/update', {
+            await axios.put('https://happy-pet-fomc.onrender.com/api/users/profile/update', {
                 HoTen: userData.HoTen,  // Giữ nguyên, KHÔNG trim()
                 NgaySinh: userData.NgaySinh,
                 GioiTinh: userData.GioiTinh.trim(), // Trim cái này để fix lỗi độ dài
@@ -124,7 +124,7 @@ const Profile = () => {
 
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/auth/change-password', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/auth/change-password', {
                 TenDangNhap: userData.TenDangNhap,
                 MatKhauCu: passData.MatKhauCu,
                 MatKhauMoi: passData.MatKhauMoi

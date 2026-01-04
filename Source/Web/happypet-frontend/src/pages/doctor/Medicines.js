@@ -13,7 +13,7 @@ const Medicines = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/doctor/medicines', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/doctor/medicines', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setItems(res.data);

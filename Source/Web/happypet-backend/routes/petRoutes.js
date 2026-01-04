@@ -12,19 +12,15 @@ const { verifyToken } = require('../middleware/authMiddleware');
 // --- CÁC ROUTE CHÍNH THỨC ---
 
 // API 1: Lấy danh sách thú cưng của tui (Gọi SP 11)
-// Đường dẫn thực tế: GET http://localhost:5000/api/pets
 router.get('/my-pets', verifyToken, petController.getMyPets);
 
 // API 2: Thêm thú cưng mới (Gọi SP 5)
-// Đường dẫn thực tế: POST http://localhost:5000/api/pets/add
 router.post('/add', verifyToken, petController.addPet);
 
 // API 5: Kiểm tra gói vaccine đang tiêm dở
-// Đường dẫn thực tế: GET http://localhost:5000/api/pets/check-ongoing-vaccine/:MaTC
 router.get('/check-ongoing-vaccine/:MaTC', verifyToken, petController.checkOngoingVaccinePackage);
 
 // API 3: Xem lịch sử khám bệnh (Gọi SP 9)
-// Đường dẫn thực tế: GET http://localhost:5000/api/pets/TC000001/medical
 // :id là cái mã thú cưng nó sẽ thay đổi tùy con bà bấm vào
 router.get('/:id/medical', verifyToken, petController.getPetMedicalHistory);
 

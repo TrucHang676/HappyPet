@@ -338,6 +338,31 @@ exports.getRecheckAppointments = async (req, res) => {
     }
 };
 
+// 🔥 MỚI: Lấy điểm tích lũy của khách hàng (Để hiển thị trong modal)
+exports.getCustomerPoints = async (req, res) => {
+    try {
+        const { maKH } = req.params;
+        
+        if (!maKH) {
+            return res.status(400).json({ message: 'Thiếu mã khách hàng!' });
+        }
+        
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('MaKH', sql.NChar(10), maKH)
+            .query('SELECT ISNULL(TongDiemTichLuy, 0) AS TongDiemTichLuy FROM KHACH_HANG WHERE MaKH = @MaKH');
+        
+        if (result.recordset.length === 0) {
+            return res.status(404).json({ message: 'Không tìm thấy khách hàng!' });
+        }
+        
+        res.json(result.recordset[0]);
+    } catch (error) {
+        console.error('❌ Lỗi lấy điểm tích lũy:', error);
+        res.status(500).json({ message: 'Lỗi server: ' + error.message });
+    }
+};
+
 // 🔥 MỚI: Xuất hóa đơn trực tiếp (Sau khi hoàn tất dịch vụ)
 exports.exportInvoice = async (req, res) => {
     try {

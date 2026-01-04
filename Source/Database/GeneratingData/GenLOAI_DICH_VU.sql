@@ -1,0 +1,6 @@
+USE HAPPYPET
+GO
+
+INSERT INTO LOAI_DICH_VU (MaLoaiDV, TenLoaiDV, GiaCoBan) VALUES (N'DV01', N'Khám bệnh', 150000.0);
+INSERT INTO LOAI_DICH_VU (MaLoaiDV, TenLoaiDV, GiaCoBan) VALUES (N'DV02', N'Tiêm vaccine', 200000.0);
+INSERT INTO LOAI_DICH_VU (MaLoaiDV, TenLoaiDV, GiaCoBan) VALUES (N'DV03', N'Mua hàng', 0.0);

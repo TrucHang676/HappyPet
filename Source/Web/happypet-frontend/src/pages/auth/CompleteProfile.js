@@ -33,7 +33,7 @@ const CompleteProfile = () => {
         e.preventDefault();
         try {
             // Gọi API hoàn tất đăng ký
-            const res = await axios.post('http://localhost:5000/api/auth/google-register', formData);
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/auth/google-register', formData);
             
             // Lưu token (Đăng nhập luôn)
             localStorage.setItem('token', res.data.token);

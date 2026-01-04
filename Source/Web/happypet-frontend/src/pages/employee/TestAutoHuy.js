@@ -10,7 +10,7 @@ const TestAutoHuy = () => {
         setResult(null);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('http://localhost:5000/api/employee/auto-huy-hen', {}, {
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/employee/auto-huy-hen', {}, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setResult({

@@ -41,7 +41,7 @@ const RecheckReminder = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                const res = await axios.get('http://localhost:5000/api/orders/history', {
+                const res = await axios.get('https://happy-pet-fomc.onrender.com/api/orders/history', {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

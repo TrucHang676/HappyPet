@@ -47,13 +47,13 @@ const VaccineDetail = () => {
             const token = localStorage.getItem('token');
             
             // Lấy thông tin bệnh nhân
-            const patientRes = await axios.get(`http://localhost:5000/api/doctor/patient-info/${maPhieu}`, {
+            const patientRes = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/patient-info/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPatientInfo(patientRes.data);
             
             // Lấy danh sách vaccine đã tiêm
-            const vaccinesRes = await axios.get(`http://localhost:5000/api/doctor/exam-detail/${maPhieu}`, {
+            const vaccinesRes = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/exam-detail/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setVaccines(vaccinesRes.data.danhSachVaccine || []);
@@ -69,7 +69,7 @@ const VaccineDetail = () => {
             // 🔥 Tính số mũi đã tiêm trong gói từ API check-ongoing-package
             if (goiInfo && patientRes.data.MaTC) {
                 try {
-                    const checkRes = await axios.get(`http://localhost:5000/api/booking/check-ongoing-package/${patientRes.data.MaTC}`, {
+                    const checkRes = await axios.get(`https://happy-pet-fomc.onrender.com/api/booking/check-ongoing-package/${patientRes.data.MaTC}`, {
                         headers: { Authorization: `Bearer ${token}` }
                     });
                     if (checkRes.data && checkRes.data.SoMuiDaTiem !== undefined) {
@@ -88,14 +88,14 @@ const VaccineDetail = () => {
             }
             
             // Lấy danh sách vaccine có sẵn
-            const availRes = await axios.get('http://localhost:5000/api/doctor/search-medicines', {
+            const availRes = await axios.get('https://happy-pet-fomc.onrender.com/api/doctor/search-medicines', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { tuKhoa: '', loai: 'Vaccine' }
             });
             setAvailableVaccines(availRes.data);
             
             // Lấy danh sách gói tiêm
-            const packRes = await axios.get('http://localhost:5000/api/doctor/vaccine-packages', {
+            const packRes = await axios.get('https://happy-pet-fomc.onrender.com/api/doctor/vaccine-packages', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPackages(packRes.data);
@@ -159,7 +159,7 @@ const VaccineDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/doctor/vaccine-history/${patientInfo.MaTC}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/vaccine-history/${patientInfo.MaTC}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setVaccineHistory(res.data);
@@ -187,7 +187,7 @@ const VaccineDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/add-vaccine', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/add-vaccine', {
                 MaPhieu: maPhieu,
                 MaVaccine: selectedVaccine,
                 LieuLuong: lieuLuong,
@@ -226,7 +226,7 @@ const VaccineDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/add-vaccine-package', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/add-vaccine-package', {
                 MaPhieu: maPhieu,
                 MaVaccine: vaccineForPackage,
                 MaGoi: selectedPackage
@@ -260,7 +260,7 @@ const VaccineDetail = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                await axios.post('http://localhost:5000/api/doctor/remove-vaccine', {
+                await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/remove-vaccine', {
                     MaPhieu: maPhieu,
                     MaVaccine: maVaccine
                 }, {
@@ -303,7 +303,7 @@ const VaccineDetail = () => {
             setLoading(true);
             try {
                 const token = localStorage.getItem('token');
-                await axios.post('http://localhost:5000/api/doctor/complete-vaccine', {
+                await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/complete-vaccine', {
                     MaPhieu: maPhieu
                 }, {
                     headers: { Authorization: `Bearer ${token}` }

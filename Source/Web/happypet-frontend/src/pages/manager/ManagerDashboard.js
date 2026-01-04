@@ -66,7 +66,7 @@ const ManagerDashboard = () => {
 
     const loadBranches = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/branches');
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/branches');
             setBranches(res.data);
         } catch (err) {
             console.error(err);
@@ -75,7 +75,7 @@ const ManagerDashboard = () => {
 
     const loadEmployees = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/employees', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/employees', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setEmployees(res.data);
@@ -86,7 +86,7 @@ const ManagerDashboard = () => {
 
     const loadProducts = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/products', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/products', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProducts(res.data);
@@ -98,7 +98,7 @@ const ManagerDashboard = () => {
     // ================ THỐNG KÊ ================
     const loadProductRevenue = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/product-revenue', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/product-revenue', {
                 params: { tuNgay: filters.tuNgay, denNgay: filters.denNgay },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -110,7 +110,7 @@ const ManagerDashboard = () => {
 
     const loadBranchRevenue = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/branch-revenue', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/branch-revenue', {
                 params: { thang: filters.thang, nam: filters.nam },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -122,7 +122,7 @@ const ManagerDashboard = () => {
 
     const loadTopEmployees = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/top-employees', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/top-employees', {
                 params: { diemSan: filters.diemSan },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -134,7 +134,7 @@ const ManagerDashboard = () => {
 
     const loadTopProducts = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/top-products', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/top-products', {
                 params: { diemSan: filters.diemSan },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -146,7 +146,7 @@ const ManagerDashboard = () => {
 
     const loadLowStock = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/low-stock-alert', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/low-stock-alert', {
                 params: { maCN: maCN, nguongCanhBao: filters.nguongCanhBao },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -158,7 +158,7 @@ const ManagerDashboard = () => {
 
     const loadTopService = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/top-service', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/top-service', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setStats(prev => ({ ...prev, topService: res.data }));
@@ -169,7 +169,7 @@ const ManagerDashboard = () => {
 
     const loadMembershipStats = async () => {
         try {
-            const res = await axios.get('http://localhost:5000/api/manager/membership-stats', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/manager/membership-stats', {
                 params: { nam: filters.nam },
                 headers: { Authorization: `Bearer ${token}` }
             });
@@ -183,7 +183,7 @@ const ManagerDashboard = () => {
     const handleTransferEmployee = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/manager/transfer-employee', 
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/manager/transfer-employee', 
                 transferData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -205,7 +205,7 @@ const ManagerDashboard = () => {
     const handleImportStock = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/manager/import-stock',
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/manager/import-stock',
                 { ...stockData, MaCN: maCN },
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -221,7 +221,7 @@ const ManagerDashboard = () => {
     const handleAddProduct = async (e) => {
         e.preventDefault();
         try {
-            const res = await axios.post('http://localhost:5000/api/manager/add-product',
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/manager/add-product',
                 newProductData,
                 { headers: { Authorization: `Bearer ${token}` } }
             );
@@ -259,7 +259,7 @@ const ManagerDashboard = () => {
         }).then(async (result) => {
             if (result.isConfirmed) {
                 try {
-                    const res = await axios.post('http://localhost:5000/api/manager/update-membership-ranking',
+                    const res = await axios.post('https://happy-pet-fomc.onrender.com/api/manager/update-membership-ranking',
                         { nam: filters.nam },
                         { headers: { Authorization: `Bearer ${token}` } }
                     );

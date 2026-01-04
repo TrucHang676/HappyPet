@@ -18,7 +18,7 @@ const Login = () => {
         setLoading(true);
         setError('');
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/login', formData);
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/auth/login', formData);
             
             localStorage.removeItem('currentOrderCode');
             localStorage.removeItem('shipBranch');
@@ -68,7 +68,7 @@ const Login = () => {
     const handleGoogleLoginSuccess = async (googleToken) => {
         setLoading(true);
         try {
-            const res = await axios.post('http://localhost:5000/api/auth/google-login', { token: googleToken });
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/auth/google-login', { token: googleToken });
 
             if (res.data.isNewUser) {
                 navigate('/complete-profile', { 

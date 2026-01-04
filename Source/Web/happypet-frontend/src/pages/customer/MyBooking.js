@@ -59,7 +59,7 @@ const MyBookings = () => {
     const handleReviewSubmit = async (reviewData) => {
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/reviews/service', reviewData, { headers: { Authorization: `Bearer ${token}` } });
+            await axios.post('https://happy-pet-fomc.onrender.com/api/reviews/service', reviewData, { headers: { Authorization: `Bearer ${token}` } });
             Swal.fire('Cảm ơn!', 'Đánh giá thành công.', 'success');
             setReviewModal(null);
             fetchBookings(); 

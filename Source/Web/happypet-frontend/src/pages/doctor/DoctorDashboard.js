@@ -13,7 +13,7 @@ const DoctorDashboard = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/doctor/waiting-list', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/doctor/waiting-list', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setWaitingList(res.data);

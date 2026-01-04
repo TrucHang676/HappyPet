@@ -98,7 +98,7 @@
 //                 CCCD: formData.CCCD || null
 //             };
 
-//             await axios.post('http://localhost:5000/api/auth/register', payload);
+//             await axios.post('https://happy-pet-fomc.onrender.com/api/auth/register', payload);
             
 //             alert('Đăng ký thành công! Bạn có thể đăng nhập ngay.');
 //             navigate('/login');
@@ -385,7 +385,7 @@ const Register = () => {
                 CCCD: formData.CCCD || null
             };
 
-            await axios.post('http://localhost:5000/api/auth/register', payload);
+            await axios.post('https://happy-pet-fomc.onrender.com/api/auth/register', payload);
 
             alert('Đăng ký thành công! Bạn có thể đăng nhập ngay.');
             navigate('/login');

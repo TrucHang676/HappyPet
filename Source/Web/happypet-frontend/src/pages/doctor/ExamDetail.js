@@ -33,7 +33,7 @@ const ExamDetail = () => {
     const fetchPatientInfo = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/doctor/patient-info/${maPhieu}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/patient-info/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPatientInfo(res.data);
@@ -47,7 +47,7 @@ const ExamDetail = () => {
     const fetchAvailableMedicines = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/doctor/medicines', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/doctor/medicines', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setAvailableMedicines(res.data);
@@ -60,7 +60,7 @@ const ExamDetail = () => {
     const fetchPrescription = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/doctor/prescription/${maPhieu}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/prescription/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setPrescription(res.data);
@@ -73,7 +73,7 @@ const ExamDetail = () => {
     const fetchMedicalHistory = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/doctor/medical-history/${maPhieu}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/doctor/medical-history/${maPhieu}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setMedicalHistory(res.data);
@@ -93,7 +93,7 @@ const ExamDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/update-diagnosis', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/update-diagnosis', {
                 MaPhieu: maPhieu,
                 ChanDoan: chanDoan,
                 NgayHenTaiKham: ngayHenTaiKham || null
@@ -118,7 +118,7 @@ const ExamDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/add-medicine', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/add-medicine', {
                 MaPhieu: maPhieu,
                 MaThuoc: selectedMedicine,
                 SoLuong: parseInt(soLuong),
@@ -156,7 +156,7 @@ const ExamDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/remove-medicine', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/remove-medicine', {
                 MaPhieu: maPhieu,
                 MaThuoc: maThuoc
             }, {
@@ -192,7 +192,7 @@ const ExamDetail = () => {
         setLoading(true);
         try {
             const token = localStorage.getItem('token');
-            await axios.post('http://localhost:5000/api/doctor/finish-exam', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/doctor/finish-exam', {
                 MaPhieu: maPhieu
             }, {
                 headers: { Authorization: `Bearer ${token}` }

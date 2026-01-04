@@ -10,7 +10,7 @@ const Services = () => {
         const fetchBranches = async () => {
             try {
                 setLoading(true);
-                const response = await axios.get('http://localhost:5000/api/branches');
+                const response = await axios.get('https://happy-pet-fomc.onrender.com/api/branches');
                 setBranches(response.data);
             } catch (err) {
                 console.error("Lỗi lấy chi nhánh:", err);

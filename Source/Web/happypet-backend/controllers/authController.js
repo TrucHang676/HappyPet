@@ -373,3 +373,66 @@ exports.completeGoogleRegister = async (req, res) => {
         res.status(500).json({ message: "Lỗi hệ thống: " + err.message });
     }
 };
+
+exports.checkAccount = async (req, res) => {
+    const { TenDangNhap } = req.query;
+    try {
+        const pool = await sql.connect();
+        const result = await pool.request()
+            .input('Ten', sql.VarChar(30), TenDangNhap ? TenDangNhap.trim() : '')
+            .query(`
+                SELECT SDT FROM KHACH_HANG 
+                WHERE LTRIM(RTRIM(MaKH)) = (
+                    SELECT LTRIM(RTRIM(MaUser)) FROM TAI_KHOAN 
+                    WHERE LTRIM(RTRIM(TenDangNhap)) = LTRIM(RTRIM(@Ten))
+                )
+            `);
+
+        if (!result.recordset || result.recordset.length === 0) {
+            // Nếu tìm Khách hàng không có, thử tìm Nhân viên (Nếu cần)
+            return res.status(404).json({ message: 'Không tìm thấy tài khoản trong HAPPYPET!' });
+        }
+
+        const sdtFull = result.recordset[0].SDT.trim();
+        // Hiện 3 số cuối như bà muốn: *******145
+        const masked = "*******" + sdtFull.slice(-3);
+        res.json({ success: true, maskedPhone: masked });
+    } catch (err) {
+        res.status(500).json({ message: "Lỗi hệ thống: " + err.message });
+    }
+};
+
+// 2. Đổi mật khẩu (Có Hash + Confirm Pass ở Frontend)
+exports.forgotPassword = async (req, res) => {
+    const { TenDangNhap, SdtNhapVao, MatKhauMoi } = req.body;
+    try {
+        const pool = await sql.connect();
+        
+        // So khớp SĐT
+        const check = await pool.request()
+            .input('User', sql.VarChar(30), TenDangNhap.trim())
+            .query(`
+                SELECT KH.SDT FROM TAI_KHOAN TK 
+                JOIN KHACH_HANG KH ON LTRIM(RTRIM(TK.MaUser)) = LTRIM(RTRIM(KH.MaKH)) 
+                WHERE LTRIM(RTRIM(TK.TenDangNhap)) = LTRIM(RTRIM(@User))
+            `);
+
+        if (check.recordset.length === 0 || check.recordset[0].SDT.trim() !== SdtNhapVao.trim()) {
+            return res.status(400).json({ message: 'Số điện thoại không chính xác!' });
+        }
+
+        // Hash mật khẩu
+        const salt = await bcrypt.genSalt(10);
+        const hashedPassword = await bcrypt.hash(MatKhauMoi, salt);
+
+        // Chạy Proc
+        await pool.request()
+            .input('TenDangNhap', sql.VarChar(30), TenDangNhap.trim())
+            .input('MatKhauMoi', sql.VarChar(255), hashedPassword)
+            .execute('sp_DoiMatKhau');
+
+        res.json({ success: true, message: 'Đã đổi mật khẩu và mã hóa thành công!' });
+    } catch (err) {
+        res.status(500).json({ message: err.message });
+    }
+};

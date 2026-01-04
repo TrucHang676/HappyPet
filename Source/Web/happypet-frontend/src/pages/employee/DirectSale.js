@@ -48,7 +48,7 @@ const DirectSale = () => {
     const loadProducts = async () => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get('http://localhost:5000/api/employee/products', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/employee/products', {
                 headers: { Authorization: `Bearer ${token}` }
             });
             setProducts(res.data);
@@ -65,7 +65,7 @@ const DirectSale = () => {
         
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/employee/search-customer?sdt=${phoneSearch}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/employee/search-customer?sdt=${phoneSearch}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -93,7 +93,7 @@ const DirectSale = () => {
         
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('http://localhost:5000/api/employee/create-customer-simple', 
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/employee/create-customer-simple', 
                 {
                     HoTen: hoTen,
                     SDT: sdt,
@@ -204,7 +204,7 @@ const DirectSale = () => {
         
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.post('http://localhost:5000/api/employee/direct-sale', 
+            const res = await axios.post('https://happy-pet-fomc.onrender.com/api/employee/direct-sale', 
                 {
                     MaKH: customerInfo.MaKH,
                     sanPham: selectedProducts.map(p => ({

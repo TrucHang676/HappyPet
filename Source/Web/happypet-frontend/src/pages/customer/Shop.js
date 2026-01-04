@@ -23,7 +23,7 @@ const Shop = () => {
         const fetchProducts = async () => {
             setLoading(true);
             try {
-                const res = await axios.get(`http://localhost:5000/api/products`, { 
+                const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/products`, { 
                     params: { tuKhoa: search, loaiMH: type }
                 });
                 setProducts(res.data);
@@ -51,7 +51,7 @@ const Shop = () => {
     // 2. Nếu đã đăng nhập thì mới chạy tiếp
     try {
         const currentMaPhieu = localStorage.getItem('activeOrder');
-        const res = await axios.post(`http://localhost:5000/api/cart/add`, {
+        const res = await axios.post(`https://happy-pet-fomc.onrender.com/api/cart/add`, {
             maKH: storedMaKH.trim(),
             maMH: product.MaMatHang,
             maPhieuHienTai: currentMaPhieu,
@@ -203,7 +203,7 @@ export default Shop;
 //         const fetchProducts = async () => {
 //             setLoading(true);
 //             try {
-//                 const res = await axios.get(`http://localhost:5000/api/orders/products`, { 
+//                 const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/orders/products`, { 
 //                     params: { tuKhoa: search, loaiMH: type }
 //                 });
 //                 setProducts(res.data);
@@ -229,7 +229,7 @@ export default Shop;
 //         // 2. Nếu đã đăng nhập thì mới chạy tiếp
 //         try {
 //             const currentMaPhieu = localStorage.getItem('activeOrder');
-//             const res = await axios.post(`http://localhost:5000/api/cart/add`, {
+//             const res = await axios.post(`https://happy-pet-fomc.onrender.com/api/cart/add`, {
 //                 maKH: storedMaKH.trim(),
 //                 maMH: product.MaMatHang,
 //                 maPhieuHienTai: currentMaPhieu,

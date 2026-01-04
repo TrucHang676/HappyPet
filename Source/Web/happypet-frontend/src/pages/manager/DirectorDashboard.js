@@ -20,7 +20,7 @@ const DirectorDashboard = () => {
     
     // Load doanh thu các chi nhánh
     const loadBranchRevenue = () => {
-        axios.get(`http://localhost:5000/api/director/revenue/branches?thang=${month}&nam=${year}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/director/revenue/branches?thang=${month}&nam=${year}`, config)
             .then(res => setBranchRevenue(res.data))
             .catch(err => console.error(err));
     };
@@ -35,7 +35,7 @@ const DirectorDashboard = () => {
         if (dateFrom) params.append('tuNgay', dateFrom);
         if (dateTo) params.append('denNgay', dateTo);
         
-        axios.get(`http://localhost:5000/api/director/revenue/top-service?${params}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/director/revenue/top-service?${params}`, config)
             .then(res => setTopService(res.data))
             .catch(err => console.error(err));
     };
@@ -46,14 +46,14 @@ const DirectorDashboard = () => {
     
     // Load thống kê hội viên
     const loadMemberStats = () => {
-        axios.get(`http://localhost:5000/api/director/members/stats?nam=${year}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/director/members/stats?nam=${year}`, config)
             .then(res => setMemberStats(res.data))
             .catch(err => console.error(err));
     };
     
     // Load thống kê thú cưng
     const loadPetStats = () => {
-        axios.get('http://localhost:5000/api/director/pets/by-type', config)
+        axios.get('https://happy-pet-fomc.onrender.com/api/director/pets/by-type', config)
             .then(res => setPetStats(res.data))
             .catch(err => console.error(err));
     };

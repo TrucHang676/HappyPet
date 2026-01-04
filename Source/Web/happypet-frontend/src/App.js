@@ -1,92 +1,3 @@
-// import React, { useEffect } from 'react';
-// import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
-
-// // 1. Import các thành phần phụ trợ
-// import Navbar from './components/Navbar';
-// import { ToastContainer, toast } from 'react-toastify';
-// import 'react-toastify/dist/ReactToastify.css';
-// import ProtectedRoute from './components/ProtectedRoute';
-
-// // 2. Import các trang (Pages)
-// import Login from './pages/auth/Login';
-// import Register from './pages/auth/Register';
-// import Home from './pages/Home';
-// import MyPets from './pages/customer/MyPets';
-// import Profile from './pages/Profile';
-// import Booking from './pages/customer/Booking';
-// import SelectVaccine from './pages/customer/SelectVaccine';
-// import CompleteProfile from './pages/auth/CompleteProfile';
-// import MyBookings from './pages/customer/MyBooking';
-// import Products from './pages/customer/Products';
-// import Cart from './pages/customer/Cart';
-// import History from './pages/customer/History';
-// import Services from './pages/Services';
-
-// // Import trang nội bộ
-// import DoctorDashboard from './pages/doctor/DoctorDashboard';
-// import EmployeeDashboard from './pages/employee/EmployeeDashboard'; 
-
-// function App() {
-
-//   // --- VIETSUB LỖI ---
-//   useEffect(() => {
-//     const originalAlert = window.alert;
-//     window.alert = (message) => {
-//       let msg = String(message);
-//       if (msg.includes('Violation of PRIMARY KEY')) msg = "Dữ liệu này đã tồn tại!";
-//       else if (msg.includes('REFERENCE constraint')) msg = "Dữ liệu đang được liên kết, không thể xóa!";
-//       else if (msg.includes('Network Error')) msg = "Lỗi kết nối máy chủ!";
-//       else if (msg.includes('String or binary data would be truncated')) msg = "Dữ liệu nhập quá dài!";
-
-//       const lowerMsg = msg.toLowerCase();
-//       if (lowerMsg.includes('thành công') || lowerMsg.includes('success')) toast.success(msg);
-//       else if (lowerMsg.includes('lỗi') || lowerMsg.includes('thất bại') || lowerMsg.includes('error')) toast.error(msg); 
-//       else toast.info(msg);
-//     };
-//     return () => { window.alert = originalAlert; };
-//   }, []);
-
-//   return (
-//     <Router>
-//       <Navbar />
-//       <ToastContainer position="top-right" autoClose={3000} theme="colored" />
-
-//       <Routes>
-//           {/* --- KHÁCH HÀNG & CHUNG --- */}
-//           <Route path="/" element={<Home />} />
-//           <Route path="/login" element={<Login />} />
-//           <Route path="/register" element={<Register />} />
-//           <Route path="/services" element={<Services />} />
-//           <Route path="/products" element={<Products />} />
-
-//           {/* Các route khách hàng cần đăng nhập mới thấy */}
-//           <Route path="/my-pets" element={<MyPets />} />
-//           <Route path="/profile" element={<Profile />} />
-//           <Route path="/booking" element={<Booking />} />
-//           <Route path="/complete-profile" element={<CompleteProfile />} />
-//           <Route path="/select-vaccine" element={<SelectVaccine />} />
-//           <Route path="/my-bookings" element={<MyBookings />} />
-//           <Route path="/cart" element={<Cart />} />
-//           <Route path="/history" element={<History />} />
-
-//           {/* --- 🔥 KHU VỰC BÁC SĨ --- */}
-//           <Route element={<ProtectedRoute allowedRoles={['Bác sĩ thú y', 'BS']} />}>
-//               <Route path="/doctor/dashboard" element={<DoctorDashboard />} />
-//           </Route>
-
-//           {/* --- 🔥 KHU VỰC TIẾP TÂN VÀ BÁN HÀNG --- */}
-//           {/* Bà xem trong DB bà ghi là 'Tiếp tân' hay 'Lễ tân' hay 'Nhân viên' thì điền vào đây */}
-//           <Route element={<ProtectedRoute allowedRoles={['Nhân viên tiếp tân', 'Nhân viên bán hàng', 'NV tiếp tân', 'NV']} />}>
-//               <Route path="/employee/dashboard" element={<EmployeeDashboard />} />
-//           </Route>
-
-//       </Routes>
-//     </Router>
-//   );
-// }
-
-// export default App;
-
 
 import React, { useEffect } from 'react';
 import { BrowserRouter as Router, Routes, Route } from 'react-router-dom';
@@ -100,6 +11,7 @@ import ProtectedRoute from './components/ProtectedRoute'; // 🔥 PHẢI CÓ CÁ
 // 2. Import các trang (Pages)
 import Login from './pages/auth/Login';
 import Register from './pages/auth/Register';
+import ForgotPassword from './pages/auth/ForgotPassword';
 import Home from './pages/Home';
 import MyPets from './pages/customer/MyPets';
 import Profile from './pages/Profile';
@@ -167,6 +79,7 @@ function App() {
           <Route path="/" element={<Home />} />
           <Route path="/login" element={<Login />} />
           <Route path="/register" element={<Register />} />
+          <Route path="/forgot-password" element={<ForgotPassword />} />
           <Route path="/services" element={<Services />} />
           <Route path="/products" element={<Products />} />
 

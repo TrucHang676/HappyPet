@@ -33,8 +33,8 @@ const Booking = () => {
         try {
             const token = localStorage.getItem('token');
             const [resBranches, resPets] = await Promise.all([
-                axios.get('http://localhost:5000/api/booking/branches'),
-                axios.get('http://localhost:5000/api/pets/my-pets', { headers: { Authorization: `Bearer ${token}` } })
+                axios.get('https://happy-pet-fomc.onrender.com/api/booking/branches'),
+                axios.get('https://happy-pet-fomc.onrender.com/api/pets/my-pets', { headers: { Authorization: `Bearer ${token}` } })
             ]);
 
             setBranches(resBranches.data);
@@ -146,7 +146,7 @@ const Booking = () => {
     const checkOngoingVaccinePackage = async (MaTC) => {
         try {
             const token = localStorage.getItem('token');
-            const res = await axios.get(`http://localhost:5000/api/pets/check-ongoing-vaccine/${MaTC}`, {
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/pets/check-ongoing-vaccine/${MaTC}`, {
                 headers: { Authorization: `Bearer ${token}` }
             });
             
@@ -164,7 +164,7 @@ const Booking = () => {
     const handleViewDoctorSchedule = async () => {
         try {
             const maCNQuery = formData.MaCN ? `?MaCN=${formData.MaCN}` : '';
-            const res = await axios.get(`http://localhost:5000/api/booking/doctors${maCNQuery}`);
+            const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/booking/doctors${maCNQuery}`);
             const doctors = res.data;
 
             if (doctors.length === 0) {
@@ -229,7 +229,7 @@ const Booking = () => {
                 const token = localStorage.getItem('token');
                 
                 // Gọi API tạo phiếu
-                const res = await axios.post('http://localhost:5000/api/booking/create', formData, {
+                const res = await axios.post('https://happy-pet-fomc.onrender.com/api/booking/create', formData, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
 

@@ -30,7 +30,7 @@ const MyPets = () => {
   const fetchPets = async () => {
     try {
         const token = localStorage.getItem('token');
-        const response = await axios.get('http://localhost:5000/api/pets/my-pets', {
+        const response = await axios.get('https://happy-pet-fomc.onrender.com/api/pets/my-pets', {
             headers: { Authorization: `Bearer ${token}` }
         });
         setPets(response.data); 
@@ -51,7 +51,7 @@ const MyPets = () => {
     e.preventDefault();
     try {
         const token = localStorage.getItem('token');
-        await axios.post('http://localhost:5000/api/pets/add', addFormData, {
+        await axios.post('https://happy-pet-fomc.onrender.com/api/pets/add', addFormData, {
             headers: { Authorization: `Bearer ${token}` }
         });
         alert("Thêm thành công! 🎉"); 
@@ -86,7 +86,7 @@ const MyPets = () => {
     try {
         const token = localStorage.getItem('token');
         await axios.put(
-            `http://localhost:5000/api/pets/update/${editFormData.MaTC}`, 
+            `https://happy-pet-fomc.onrender.com/api/pets/update/${editFormData.MaTC}`, 
             editFormData, 
             { headers: { Authorization: `Bearer ${token}` } }
         );
@@ -112,7 +112,7 @@ const MyPets = () => {
         if (result.isConfirmed) {
             try {
                 const token = localStorage.getItem('token');
-                await axios.delete(`http://localhost:5000/api/pets/delete/${petId}`, {
+                await axios.delete(`https://happy-pet-fomc.onrender.com/api/pets/delete/${petId}`, {
                     headers: { Authorization: `Bearer ${token}` }
                 });
                 Swal.fire('Đã xóa!', 'Bé đã bị xóa khỏi danh sách.', 'success');
@@ -129,7 +129,7 @@ const MyPets = () => {
       setActiveTab('kham'); 
       try {
           const token = localStorage.getItem('token');
-          const res = await axios.get(`http://localhost:5000/api/pets/history/${pet.MaTC}`, {
+          const res = await axios.get(`https://happy-pet-fomc.onrender.com/api/pets/history/${pet.MaTC}`, {
               headers: { Authorization: `Bearer ${token}` }
           });
           setMedicalData(res.data); 

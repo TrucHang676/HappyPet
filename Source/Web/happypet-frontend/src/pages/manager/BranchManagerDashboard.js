@@ -35,7 +35,7 @@ const BranchManagerDashboard = () => {
     
     // Load doanh thu
     const loadRevenue = () => {
-        axios.get(`http://localhost:5000/api/branch-manager/revenue?loaiThongKe=THANG&nam=${revenueYear}&thang=${revenueMonth}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/branch-manager/revenue?loaiThongKe=THANG&nam=${revenueYear}&thang=${revenueMonth}`, config)
             .then(res => setRevenue(res.data))
             .catch(err => console.error(err));
     };
@@ -46,14 +46,14 @@ const BranchManagerDashboard = () => {
     
     // Load nhân viên
     const loadEmployees = () => {
-        axios.get('http://localhost:5000/api/branch-manager/employees', config)
+        axios.get('https://happy-pet-fomc.onrender.com/api/branch-manager/employees', config)
             .then(res => setEmployees(res.data))
             .catch(err => console.error(err));
     };
     
     // Load tồn kho cảnh báo
     const loadInventory = () => {
-        axios.get(`http://localhost:5000/api/branch-manager/inventory/alert?nguongCanhBao=${nguongCanhBao}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/branch-manager/inventory/alert?nguongCanhBao=${nguongCanhBao}`, config)
             .then(res => setInventory(res.data))
             .catch(err => console.error(err));
     };
@@ -70,7 +70,7 @@ const BranchManagerDashboard = () => {
         }
         
         try {
-            await axios.post('http://localhost:5000/api/branch-manager/inventory/import', {
+            await axios.post('https://happy-pet-fomc.onrender.com/api/branch-manager/inventory/import', {
                 maMatHang: selectedProduct,
                 soLuongNhap: importQuantity
             }, config);
@@ -91,7 +91,7 @@ const BranchManagerDashboard = () => {
         if (dateFrom) params.append('tuNgay', dateFrom);
         if (dateTo) params.append('denNgay', dateTo);
         
-        axios.get(`http://localhost:5000/api/branch-manager/revenue/products?${params}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/branch-manager/revenue/products?${params}`, config)
             .then(res => {
                 console.log('Product revenue data:', res.data);
                 setProductRevenue(res.data);
@@ -101,7 +101,7 @@ const BranchManagerDashboard = () => {
     
     // Load nhân viên xuất sắc
     const loadTopEmployees = () => {
-        axios.get(`http://localhost:5000/api/branch-manager/employees/top-rated?diemSan=${diemSan}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/branch-manager/employees/top-rated?diemSan=${diemSan}`, config)
             .then(res => {
                 console.log('Top employees data:', res.data);
                 setTopEmployees(res.data);
@@ -111,7 +111,7 @@ const BranchManagerDashboard = () => {
     
     // Load dịch vụ doanh thu cao nhất
     const loadTopService = () => {
-        axios.get('http://localhost:5000/api/branch-manager/service/top-revenue', config)
+        axios.get('https://happy-pet-fomc.onrender.com/api/branch-manager/service/top-revenue', config)
             .then(res => {
                 console.log('Top service data:', res.data);
                 setTopService(res.data);
@@ -121,7 +121,7 @@ const BranchManagerDashboard = () => {
     
     // Load thống kê hội viên
     const loadMemberStats = () => {
-        axios.get(`http://localhost:5000/api/branch-manager/members/stats?nam=${year}`, config)
+        axios.get(`https://happy-pet-fomc.onrender.com/api/branch-manager/members/stats?nam=${year}`, config)
             .then(res => {
                 console.log('Member stats data:', res.data);
                 setMemberStats(res.data);

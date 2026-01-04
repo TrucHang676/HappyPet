@@ -42,7 +42,7 @@ const RecheckReminder = () => {
             const token = localStorage.getItem('token');
             const { tuNgay, denNgay } = getDateRange();
 
-            const res = await axios.get('http://localhost:5000/api/employee/recheck-appointments', {
+            const res = await axios.get('https://happy-pet-fomc.onrender.com/api/employee/recheck-appointments', {
                 headers: { Authorization: `Bearer ${token}` },
                 params: { tuNgay, denNgay }
             });
