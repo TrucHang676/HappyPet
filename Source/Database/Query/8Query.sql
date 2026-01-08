@@ -1,4 +1,4 @@
-USE HAPPYPET_test
+USE HAPPYPET
 GO
 
 -- T1: Tra cứu danh sách thú cưng đến hẹn tái khám
