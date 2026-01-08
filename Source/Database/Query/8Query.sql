@@ -29,7 +29,7 @@ GO
 -- T2: Tra cứu sản phẩm (theo Tên/Loại) của một chi nhánh
 DECLARE @MaCN NCHAR(10) = 'CN01';
 DECLARE @TuKhoa NVARCHAR(80) = N'Trị'; -- Nhập tên để tìm (hoặc NULL)
-DECLARE @LoaiMH VARCHAR(3) = NULL;   -- Nhập mã loại: 'T', 'VC', 'SPK' (hoặc NULL)
+DECLARE @LoaiMH VARCHAR(3) = 'T';   -- Nhập mã loại: 'T', 'VC', 'SPK'
 
 SELECT 
     MH.MaMatHang AS N'Mã mặt hàng', 
@@ -41,7 +41,7 @@ FROM TON_KHO TK
 	JOIN MAT_HANG MH ON TK.MaMatHang = MH.MaMatHang
 WHERE TK.MaCN = @MaCN
   AND (@TuKhoa IS NULL OR MH.TenMatHang LIKE N'%' + @TuKhoa + '%')
-  AND (@LoaiMH IS NULL OR MH.LoaiMH = @LoaiMH)
+  AND MH.LoaiMH = @LoaiMH
 ORDER BY TK.SoLuongTon DESC
 GO
 
@@ -64,28 +64,20 @@ WHERE PDV.MaCN = @MaCN
 	AND CAST(PDV.TG_ThucHienDV AS DATE) = @NgayTraCuu
 GO
 
--- T4: Thống kê hiệu suất nhân viên
-DECLARE @Thang INT = 12;
-DECLARE @Nam INT = 2024;
-DECLARE @MaCN nchar(10) = 'CN01';
+-- TV4: Nhân viên update trạng thái của một Phiếu Dịch Vụ
+DECLARE @MaPhieuCanSua NCHAR(10) = 'P0109999';
+DECLARE @TrangThaiMoi VARCHAR(3) = 'DTH';      
 
-SELECT 
-    NV.MaNV AS N'Mã NV',
-    U.HoTen AS N'Tên NV',
-    NV.ChucVu AS 'Chức vụ',
-    COUNT(PDV.MaPhieu) AS [Số phiếu đã xử lí]
-FROM NHAN_VIEN NV
-	JOIN [USER] U ON NV.MaNV = U.MaUser
--- Left Join để hiển thị cả những nhân viên không làm phiếu nào (Số phiếu = 0)
-	LEFT JOIN PHIEU_DICH_VU PDV ON NV.MaNV = PDV.MaNV 
-    AND MONTH(PDV.TG_LapPhieu) = @Thang 
-    AND YEAR(PDV.TG_LapPhieu) = @Nam
-WHERE 
-    NV.MaCN = @MaCN
-	AND NV.ChucVu <> N'Quản lý chi nhánh'
-GROUP BY NV.MaNV, U.HoTen, NV.ChucVu
-ORDER BY [Số phiếu đã xử lí] DESC
+UPDATE PHIEU_DICH_VU
+SET 
+    TrangThai = @TrangThaiMoi,
+    TG_ThucHienDV = CASE 
+                        WHEN @TrangThaiMoi = 'DTH' THEN GETDATE() 
+                        ELSE TG_ThucHienDV 
+                    END
+WHERE MaPhieu = @MaPhieuCanSua
 GO
+
 
 -- T5: Thống kê doanh thu theo tháng của từng chi nhánh theo từng loại dịch vụ
 DECLARE @Thang INT = 12;
