@@ -1,4 +1,4 @@
-﻿USE HAPPYPET_test
+﻿USE HAPPYPET
 GO
 
 -- Trigger "Đóng băng" phiếu đã hoàn tất
