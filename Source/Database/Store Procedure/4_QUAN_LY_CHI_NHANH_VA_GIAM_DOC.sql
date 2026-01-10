@@ -654,25 +654,25 @@ BEGIN
         RTRIM(ISNULL(P.TrangThai, 'DD')) AS TrangThai,
         KH.SDT,
         HTT.DiaChiGiaoHang AS DiaChi,
-        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, -- 🔥 LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
+        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, --   LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
         HTT.MaPhieu AS MaHD,  -- Để biết có HD_TRUC_TUYEN không
-        HDTT.PhuongThucTT AS PhuongThucTT, -- 🔥 LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
-        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, -- 🔥 MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
-        RTRIM(P.MaNV) AS MaNV_BacSi, -- 🔥 MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
-        U_BacSi.HoTen AS TenBacSi -- 🔥 LẤY TÊN BÁC SĨ ĐÃ GÁN
+        HDTT.PhuongThucTT AS PhuongThucTT, --   LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
+        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, --   MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
+        RTRIM(P.MaNV) AS MaNV_BacSi, --   MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
+        U_BacSi.HoTen AS TenBacSi --   LẤY TÊN BÁC SĨ ĐÃ GÁN
     FROM PHIEU_DICH_VU P
     JOIN KHACH_HANG KH ON P.MaKH = KH.MaKH
     JOIN [USER] U ON KH.MaKH = U.MaUser
-    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser -- 🔥 JOIN ĐỂ LẤY TÊN BÁC SĨ
+    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser --   JOIN ĐỂ LẤY TÊN BÁC SĨ
     LEFT JOIN PHIEU_KHAM_BENH PKB ON P.MaPhieu = PKB.MaPhieu
     LEFT JOIN PHIEU_TIEM_VACCINE PTV ON P.MaPhieu = PTV.MaPhieu
     LEFT JOIN THU_CUNG TC ON ISNULL(PKB.MaTC, PTV.MaTC) = TC.MaTC
     LEFT JOIN HD_TRUC_TUYEN HTT ON P.MaPhieu = HTT.MaPhieu
-    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu -- 🔥 JOIN ĐỂ LẤY PHƯƠNG THỨC TT
+    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu --   JOIN ĐỂ LẤY PHƯƠNG THỨC TT
     WHERE P.MaCN = @MaCN 
       AND (@TrangThai IS NULL OR RTRIM(P.TrangThai) = @TrangThai)
       AND (
-          -- 🔥 LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
+          --  LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
           -- 1. Ngày ĐẶT nằm trong khoảng (đơn mới đặt cần xử lý)
           -- 2. Ngày MUỐN NHẬN nằm trong khoảng (đơn đến hạn giao)
           CAST(P.TG_LapPhieu AS DATE) BETWEEN @TuNgay AND @DenNgay
@@ -738,16 +738,16 @@ BEGIN
         P.TrangThai,
         P.TG_ThucHienDV AS NgayMua,
         
-        -- ✅ Lấy tên thú cưng (luôn hiện dù đã hủy)
+        --  Lấy tên thú cưng (luôn hiện dù đã hủy)
         COALESCE(TC.Ten, N'Không rõ') AS TenThuCung,
         COALESCE(TC.Ten, N'Không rõ') AS TenPet,
         
-        -- ✅ Lấy triệu chứng từ phiếu khám bệnh (luôn hiện dù đã hủy)
+        --    Lấy triệu chứng từ phiếu khám bệnh (luôn hiện dù đã hủy)
         COALESCE(PKB.TrieuChung, N'') AS TrieuChung,
         
         -- Các thông tin khác
         PKB.ChanDoan,
-        PKB.NgayHenTaiKham, -- ✅ Thêm ngày hẹn tái khám
+        PKB.NgayHenTaiKham, --    Thêm ngày hẹn tái khám
         
         -- Vaccine (lấy từ MAT_HANG vì VACCINE không có TenVaccine)
         CASE 
@@ -773,7 +773,7 @@ BEGIN
     FROM PHIEU_DICH_VU P
     LEFT JOIN CHI_NHANH CN ON P.MaCN = CN.MaCN
     
-    -- ✅ LEFT JOIN để luôn lấy được thông tin dù phiếu đã hủy
+    --    LEFT JOIN để luôn lấy được thông tin dù phiếu đã hủy
     LEFT JOIN PHIEU_KHAM_BENH PKB ON P.MaPhieu = PKB.MaPhieu
     LEFT JOIN PHIEU_TIEM_VACCINE PTV ON P.MaPhieu = PTV.MaPhieu
     LEFT JOIN THU_CUNG TC ON RTRIM(COALESCE(PKB.MaTC, PTV.MaTC)) = RTRIM(TC.MaTC)
@@ -1018,4 +1018,5 @@ BEGIN
         RAISERROR(@Err, 16, 1);
     END CATCH
 END;
+
 GO
