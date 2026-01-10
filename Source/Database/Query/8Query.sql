@@ -78,7 +78,6 @@ SET
 WHERE MaPhieu = @MaPhieuCanSua
 GO
 
-
 -- T5: Thống kê doanh thu theo tháng của từng chi nhánh theo từng loại dịch vụ
 DECLARE @Thang INT = 12;
 DECLARE @Nam INT = 2024;
