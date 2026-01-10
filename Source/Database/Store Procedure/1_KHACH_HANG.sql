@@ -303,11 +303,11 @@ BEGIN
         -- Thông tin điểm tích lũy hiện tại
         ISNULL(KH.TongDiemTichLuy, 0) AS DiemTichLuy,
 
-        -- 🔥 FIX: Lấy hạng từ năm GẦN NHẤT (không nhất thiết phải năm ngoái)
+        --   FIX: Lấy hạng từ năm GẦN NHẤT (không nhất thiết phải năm ngoái)
         -- Vì có thể chưa chốt năm ngoái, hoặc data test có năm khác
         ISNULL(HTV.TenHang, N'Thành viên mới') AS HangThanhVien,
         ISNULL(HTV.MaHang, 'C01') AS MaHang,
-        ISNULL(HTV.KhuyenMaiUuTien, 0) AS GiamGiaThanhVien,  -- 🔥 THÊM % giảm giá
+        ISNULL(HTV.KhuyenMaiUuTien, 0) AS GiamGiaThanhVien,  --   THÊM % giảm giá
         
         -- Hiển thị mức chi tiêu đã chốt
         ISNULL(XHN.TongChiTieu, 0) AS TongChiTieuNamNgoai
@@ -316,7 +316,7 @@ BEGIN
     JOIN [USER] U ON KH.MaKH = U.MaUser
     JOIN TAI_KHOAN TK ON KH.MaKH = TK.MaUser
     
-    -- 🔥 LEFT JOIN với subquery lấy XẾP HẠNG NĂM GẦN NHẤT
+    --  LEFT JOIN với subquery lấy XẾP HẠNG NĂM GẦN NHẤT
     LEFT JOIN (
         SELECT TOP 1 MaKH, MaHang, TongChiTieu, Nam
         FROM XEP_HANG_NAM
@@ -448,7 +448,7 @@ BEGIN
         DECLARE @MaTC NCHAR(10);
         DECLARE @MaxNum INT;
 
-        -- 🔥 FIX: Xử lý đúng với cả TC046784 và TC000001
+        --  FIX: Xử lý đúng với cả TC046784 và TC000001
         SELECT @MaxNum = MAX(
             TRY_CAST(
                 -- Bỏ hết chữ "TC" hoặc "TC_", chỉ lấy số
@@ -656,7 +656,7 @@ BEGIN
     -- Chuyển đổi @GioHen từ string 'HH:MM' sang DATETIME
     DECLARE @ThoiGianHen DATETIME;
     BEGIN TRY
-        -- ✅ FIX: Ghép string trước khi CAST
+        --  FIX: Ghép string trước khi CAST
         SET @ThoiGianHen = CAST(CONVERT(VARCHAR(10), @NgayHen, 120) + ' ' + @GioHen AS DATETIME);
     END TRY
     BEGIN CATCH
@@ -718,7 +718,7 @@ BEGIN
     END
 
     -- =============================================
-    -- 4. 🔥 SỬA LOGIC KIỂM TRA QUÁ TẢI (FIX CHÍNH)
+    -- 4.   SỬA LOGIC KIỂM TRA QUÁ TẢI (FIX CHÍNH)
     -- =============================================
     DECLARE @TongSoBacSi INT;
     DECLARE @SoPhieuDaDat INT;
@@ -736,7 +736,7 @@ BEGIN
         RETURN;
     END
 
-    -- B. 🔥 ĐẾM SỐ PHIẾU THEO KHUNG GIỜ (60 phút)
+    -- B.   ĐẾM SỐ PHIẾU THEO KHUNG GIỜ (60 phút)
     -- Logic: Trong cùng 1 giờ (VD: 09:00-09:59), chỉ cho đặt tối đa = số bác sĩ
     DECLARE @GioHenStart DATETIME = @ThoiGianHen;
     DECLARE @GioHenEnd DATETIME = DATEADD(HOUR, 1, @GioHenStart);
@@ -876,13 +876,13 @@ BEGIN
     BEGIN TRANSACTION;
     BEGIN TRY
         
-        -- ❌ KHÔNG HOÀN KHO vì phiếu DD chưa lấy hàng từ kho
-        -- ❌ KHÔNG XÓA CT_TIEM_VC vì cần giữ lịch sử đã đăng ký (chưa tiêm thật)
+        --  KHÔNG HOÀN KHO vì phiếu DD chưa lấy hàng từ kho
+        --     KHÔNG XÓA CT_TIEM_VC vì cần giữ lịch sử đã đăng ký (chưa tiêm thật)
         
         -- Chỉ xóa đăng ký gói tiêm (nếu có)
         DELETE FROM DANG_KI_GOI_TIEM WHERE MaPhieu = @MaPhieu;
 
-        -- ✅ GIỮ LẠI PHIEU_KHAM_BENH và PHIEU_TIEM_VACCINE để lưu thông tin thú cưng
+        --    GIỮ LẠI PHIEU_KHAM_BENH và PHIEU_TIEM_VACCINE để lưu thông tin thú cưng
         
         -- Cập nhật trạng thái phiếu
         UPDATE PHIEU_DICH_VU
@@ -928,25 +928,25 @@ BEGIN
         RTRIM(ISNULL(P.TrangThai, 'DD')) AS TrangThai,
         KH.SDT,
         HTT.DiaChiGiaoHang AS DiaChi,
-        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, -- 🔥 LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
+        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, --   LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
         HTT.MaPhieu AS MaHD,  -- Để biết có HD_TRUC_TUYEN không
-        HDTT.PhuongThucTT AS PhuongThucTT, -- 🔥 LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
-        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, -- 🔥 MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
-        RTRIM(P.MaNV) AS MaNV_BacSi, -- 🔥 MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
-        U_BacSi.HoTen AS TenBacSi -- 🔥 LẤY TÊN BÁC SĨ ĐÃ GÁN
+        HDTT.PhuongThucTT AS PhuongThucTT, --   LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
+        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, --   MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
+        RTRIM(P.MaNV) AS MaNV_BacSi, --   MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
+        U_BacSi.HoTen AS TenBacSi --   LẤY TÊN BÁC SĨ ĐÃ GÁN
     FROM PHIEU_DICH_VU P
     JOIN KHACH_HANG KH ON P.MaKH = KH.MaKH
     JOIN [USER] U ON KH.MaKH = U.MaUser
-    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser -- 🔥 JOIN ĐỂ LẤY TÊN BÁC SĨ
+    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser --   JOIN ĐỂ LẤY TÊN BÁC SĨ
     LEFT JOIN PHIEU_KHAM_BENH PKB ON P.MaPhieu = PKB.MaPhieu
     LEFT JOIN PHIEU_TIEM_VACCINE PTV ON P.MaPhieu = PTV.MaPhieu
     LEFT JOIN THU_CUNG TC ON ISNULL(PKB.MaTC, PTV.MaTC) = TC.MaTC
     LEFT JOIN HD_TRUC_TUYEN HTT ON P.MaPhieu = HTT.MaPhieu
-    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu -- 🔥 JOIN ĐỂ LẤY PHƯƠNG THỨC TT
+    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu --   JOIN ĐỂ LẤY PHƯƠNG THỨC TT
     WHERE P.MaCN = @MaCN 
       AND (@TrangThai IS NULL OR RTRIM(P.TrangThai) = @TrangThai)
       AND (
-          -- 🔥 LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
+          --   LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
           -- 1. Ngày ĐẶT nằm trong khoảng (đơn mới đặt cần xử lý)
           -- 2. Ngày MUỐN NHẬN nằm trong khoảng (đơn đến hạn giao)
           CAST(P.TG_LapPhieu AS DATE) BETWEEN @TuNgay AND @DenNgay
@@ -1740,7 +1740,7 @@ BEGIN
         GOI.TenGoi,
         GOI.SoMuiTuongUng AS TongSoMui,
         DK.NgayHetHan,
-        -- 🔥 Đếm số mũi đã tiêm của gói này (CHỈ PHIẾU ĐÃ HOÀN TẤT)
+        --   Đếm số mũi đã tiêm của gói này (CHỈ PHIẾU ĐÃ HOÀN TẤT)
         -- Lý do: Phải đếm đúng số mũi thực tế đã tiêm, không tính phiếu bị hủy
         ISNULL((
             SELECT COUNT(*) 
@@ -1770,7 +1770,7 @@ BEGIN
     INNER JOIN PHIEU_DICH_VU PDV ON DK.MaPhieu = PDV.MaPhieu
     WHERE PTV.MaTC = @MaTC
       AND DK.HieuLuc = 1
-      -- 🔥 BỎ điều kiện PDV.TrangThai = 'DHT' để tìm gói dù phiếu đăng ký đã hoàn tất hay chưa
+      --   BỎ điều kiện PDV.TrangThai = 'DHT' để tìm gói dù phiếu đăng ký đã hoàn tất hay chưa
       -- Vì khách có thể đến lần 2 (phiếu mới chưa hoàn tất) nhưng gói vẫn còn hiệu lực
       AND (DK.NgayHetHan IS NULL OR DK.NgayHetHan > GETDATE())
       -- CHỈ LẤY GÓI CHƯA TIÊM ĐỦ SỐ MŨI QUY ĐỊNH
@@ -1784,7 +1784,7 @@ BEGIN
             AND PDV3.TrangThai = 'DHT' -- CHỈ TÍNH PHIẾU ĐÃ HOÀN TẤT
             AND PDV3.TG_LapPhieu >= (SELECT P.TG_LapPhieu FROM PHIEU_DICH_VU P WHERE P.MaPhieu = DK.MaPhieu)
       ), 0)
-    -- 🔥 LẤY GÓI CŨ NHẤT (đăng ký đầu tiên) để đếm đủ số mũi từ đầu
+    --   LẤY GÓI CŨ NHẤT (đăng ký đầu tiên) để đếm đủ số mũi từ đầu
     ORDER BY DK.MaPhieu ASC;
     
 END;
@@ -1965,7 +1965,7 @@ BEGIN
         MH.LoaiMH,
         MH.DonGia,
 
-        -- 🔥 ĐÃ CHÈN THÊM TÍNH ĐIỂM Ở ĐÂY 🔥
+        --   ĐÃ CHÈN THÊM TÍNH ĐIỂM Ở ĐÂY  
         ISNULL((SELECT AVG(CAST(DiemChatLuong AS FLOAT)) 
                 FROM DANH_GIA_SP 
                 WHERE MaMatHang = MH.MaMatHang), 0) AS DiemTrungBinh,
@@ -1973,7 +1973,7 @@ BEGIN
         (SELECT COUNT(*) 
          FROM DANH_GIA_SP 
          WHERE MaMatHang = MH.MaMatHang) AS SoLuongDanhGia,
-        -- 🔥 KẾT THÚC ĐOẠN CHÈN 🔥
+        --   KẾT THÚC ĐOẠN CHÈN  
 
         CASE 
             WHEN SUM(TK.SoLuongTon) > 0 THEN N'Còn hàng'
@@ -1983,7 +1983,7 @@ BEGIN
     LEFT JOIN TON_KHO TK 
         ON MH.MaMatHang = TK.MaMatHang
 
-    -- ✅ Join bảng THUOC (con của MAT_HANG)
+    --    Join bảng THUOC (con của MAT_HANG)
     LEFT JOIN THUOC T
         ON T.MaThuoc = MH.MaMatHang   
 
@@ -1991,10 +1991,10 @@ BEGIN
         (@TuKhoa IS NULL OR MH.TenMatHang LIKE N'%' + @TuKhoa + N'%')
         AND (@LoaiMH IS NULL OR MH.LoaiMH = @LoaiMH)
 
-        -- ✅ 1) Vaccine không bán lẻ online
+        --    1) Vaccine không bán lẻ online
         AND MH.LoaiMH <> 'VC'
 
-        -- ✅ 2) Thuốc chỉ bán "Không cần kê đơn"
+        --    2) Thuốc chỉ bán "Không cần kê đơn"
         AND (
             MH.LoaiMH <> 'T'
             OR (MH.LoaiMH = 'T' AND ISNULL(T.LoaiThuoc, N'') = N'Không cần kê đơn')
@@ -2154,7 +2154,7 @@ BEGIN
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DTH',             -- Chuyển sang Đang thực hiện
             MaNV = @MaNV_PhuTrach,         -- Gán nhân viên phụ trách
-            TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian check-in thực tế
+            TG_ThucHienDV = GETDATE()      --   GHI ĐÈ = thời gian check-in thực tế
         WHERE MaPhieu = @MaPhieu;
 
         -- 2.2 Tạo Hóa Đơn Trực Tiếp
@@ -2228,10 +2228,10 @@ BEGIN
         P.TrangThai,
         ISNULL(CN.TenCN, N'Online') AS ChiNhanh,
         
-        -- ✅ FIX 1: Phí Ship (Nếu null thì mặc định 0)
+        --    FIX 1: Phí Ship (Nếu null thì mặc định 0)
         ISNULL(HD.PhiGiaoHang, 0) AS PhiGiaoHang,
 
-        -- ✅ FIX 2: Tự động tính tổng tiền (CƠ CHẾ DỰ PHÒNG)
+        --    FIX 2: Tự động tính tổng tiền (CƠ CHẾ DỰ PHÒNG)
         -- Logic: Nếu bảng Hóa Đơn (HD) có tiền thì lấy. 
         -- Nếu HD bị lỗi/null/0 -> Tự động tính tổng từ bảng chi tiết (CT_MUA_HANG)
         CASE 
@@ -2248,7 +2248,7 @@ BEGIN
     FROM PHIEU_DICH_VU P
     LEFT JOIN CHI_NHANH CN ON P.MaCN = CN.MaCN
     
-    -- ✅ FIX 3: Cắt khoảng trắng 2 đầu (RTRIM/LTRIM) để JOIN dính chặt 100%
+    --    FIX 3: Cắt khoảng trắng 2 đầu (RTRIM/LTRIM) để JOIN dính chặt 100%
     LEFT JOIN HD_TRUC_TUYEN HD ON LTRIM(RTRIM(P.MaPhieu)) = LTRIM(RTRIM(HD.MaPhieu))
     
     JOIN CT_MUA_HANG CT ON P.MaPhieu = CT.MaPhieu
@@ -2259,4 +2259,5 @@ BEGIN
     ORDER BY P.TG_LapPhieu DESC;
 END
 GO
+
 
