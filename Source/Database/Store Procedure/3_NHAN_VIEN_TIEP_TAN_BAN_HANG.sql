@@ -21,7 +21,7 @@ CHỨC NĂNG CHI TIẾT:
 6. Tra cứu: Sản phẩm, Theo chi nhánh
 
 
-TỔNG SỐ SP: 13
+TỔNG SỐ SP: 14
 
 ===============================================
 DANH SÁCH STORED PROCEDURES:
@@ -54,7 +54,7 @@ DANH SÁCH STORED PROCEDURES:
 
 -- 7. QUẢN LÝ HÀNG HÓA
 -- sp_ThemMatHang                  : Thêm mặt hàng mới vào kho
-
+-- sp_CapNhatTrangThaiDonHang      : Cập nhật trạng thái đơn hàng
 
 
 USE HAPPYPET
@@ -1151,5 +1151,89 @@ BEGIN
         RAISERROR(@Err, 16, 1);
     END CATCH
 END;
+GO
+
+CREATE   PROC [dbo].[sp_CapNhatTrangThaiDonHang]
+    @MaPhieu NCHAR(10),
+    @MaNV NCHAR(10),       
+    @TrangThaiMoi VARCHAR(3) -- 'DTH' (Đang giao) hoặc 'DHT' (Giao xong/Hoàn tất)
+AS
+BEGIN
+    SET NOCOUNT ON;
+    SET XACT_ABORT ON;
+
+    -- 1. KIỂM TRA INPUT
+    IF @TrangThaiMoi NOT IN ('DTH', 'DHT')
+    BEGIN
+        RAISERROR(N'Trạng thái không hợp lệ! Chỉ chấp nhận: DTH (Đang thực hiện), DHT (Đã hoàn tất).', 16, 1);
+        RETURN;
+    END
+
+    -- 2. LẤY THÔNG TIN CŨ
+    DECLARE @TrangThaiCu VARCHAR(3);
+    DECLARE @MaKH NCHAR(10);
+    
+    SELECT @TrangThaiCu = TrangThai, @MaKH = MaKH 
+    FROM PHIEU_DICH_VU 
+    WHERE MaPhieu = @MaPhieu;
+
+    -- Kiểm tra tồn tại
+    IF @TrangThaiCu IS NULL
+    BEGIN
+        RAISERROR(N'Đơn hàng không tồn tại.', 16, 1);
+        RETURN;
+    END
+
+    -- Kiểm tra hủy
+    IF @TrangThaiCu = 'DH'
+    BEGIN
+        RAISERROR(N'Đơn hàng này đã bị hủy, không thể cập nhật trạng thái.', 16, 1);
+        RETURN;
+    END
+
+    BEGIN TRANSACTION;
+    BEGIN TRY
+        -- 3. CẬP NHẬT TRẠNG THÁI & NV
+        UPDATE PHIEU_DICH_VU
+        SET TrangThai = @TrangThaiMoi,
+            MaNV = @MaNV 
+        WHERE MaPhieu = @MaPhieu;
+
+        -- 4. LOGIC CỘNG ĐIỂM TÍCH LŨY (Chỉ chạy khi Hoàn tất đơn - DHT)
+        -- Điều kiện: Trạng thái mới là DHT VÀ Trạng thái cũ CHƯA PHẢI là DHT (để tránh cộng điểm 2 lần nếu lỡ chạy lại SP)
+        IF @TrangThaiMoi = 'DHT' AND @TrangThaiCu <> 'DHT'
+        BEGIN
+            DECLARE @TongTienThanhToan DECIMAL(18,2);
+            DECLARE @DiemCong INT;
+
+            -- Lấy tổng tiền thực trả (SC) từ hóa đơn
+            SELECT @TongTienThanhToan = ISNULL(TongThanhTienSC, 0)
+            FROM HD_TRUC_TUYEN
+            WHERE MaPhieu = @MaPhieu;
+
+            -- Tính điểm: 50.000 VNĐ = 1 điểm (Lấy phần nguyên)
+            SET @DiemCong = CAST(@TongTienThanhToan / 50000 AS INT);
+
+            IF @DiemCong > 0
+            BEGIN
+                UPDATE KHACH_HANG
+                SET TongDiemTichLuy = TongDiemTichLuy + @DiemCong
+                WHERE MaKH = @MaKH;
+                
+                PRINT N'Đã cộng ' + CAST(@DiemCong AS NVARCHAR(20)) + N' điểm tích lũy cho khách hàng.';
+            END
+        END
+
+        COMMIT TRANSACTION;
+        PRINT N'Cập nhật trạng thái đơn hàng thành công: ' + @TrangThaiMoi;
+
+    END TRY
+    BEGIN CATCH
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
+        DECLARE @ErrorMessage NVARCHAR(4000) = ERROR_MESSAGE();
+        RAISERROR(@ErrorMessage, 16, 1);
+    END CATCH
+END;
+
 GO
 
