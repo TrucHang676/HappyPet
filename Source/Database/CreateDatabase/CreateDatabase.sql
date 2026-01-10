@@ -113,13 +113,14 @@ CREATE TABLE HANG_TV (
 
 --12. Bảng XEP_HANG_NAM
 CREATE TABLE XEP_HANG_NAM (
-    MaKH         nchar(10),
-    Nam          int,
+    MaKH         nchar(10) NOT NULL,
+    Nam          int NOT NULL,
     MaHang       nchar(5),
     TongChiTieu  decimal(18,2),
     NgayCapNhat  date,
-	PRIMARY KEY (MaKH, Nam)
-);
+
+    CONSTRAINT PK_XEP_HANG_NAM PRIMARY KEY CLUSTERED (MaKH, Nam)
+) ON PS_Xep_Hang_Nam(Nam);
 
 --13. Bảng HD_TRUC_TUYEN 
 CREATE TABLE HD_TRUC_TUYEN  (
