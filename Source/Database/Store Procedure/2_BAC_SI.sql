@@ -124,7 +124,7 @@ BEGIN
         -- A. Update trạng thái phiếu
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DHT',         -- Đánh dấu là Đã Hoàn Thành (về mặt chuyên môn)
-            TG_ThucHienDV = GETDATE()  -- 🔥 GHI ĐÈ = thời gian hoàn thành khám
+            TG_ThucHienDV = GETDATE()  --  GHI ĐÈ = thời gian hoàn thành khám
         WHERE MaPhieu = @MaPhieu;
         
         -- B. Update tổng tiền vào hóa đơn (đã tồn tại từ lúc check-in)
@@ -251,7 +251,7 @@ BEGIN
         VALUES (@MaPhieu, @MaVaccine, @MaGoi, @NgayHetHan, 1, @ThanhTienGoi);
 
         -- B3: Insert vào Chi Tiết Tiêm (Mũi 1)
-        -- 🔥 MŨI 1 TRẢ TIỀN GÓI, từ mũi 2 trở đi mới miễn phí
+        --   MŨI 1 TRẢ TIỀN GÓI, từ mũi 2 trở đi mới miễn phí
         INSERT INTO CT_TIEM_VC (MaVaccine, MaPhieu, NhacLai, LieuLuong, ThanhTien)
         VALUES (@MaVaccine, @MaPhieu, 0, N'Mũi 1/'+CAST(@SoMuiTuongUng AS NVARCHAR(5)), @ThanhTienGoi);
 
@@ -565,7 +565,7 @@ BEGIN
         RETURN;
     END
 
-    -- 🔥 TÍNH TỔNG TIỀN TỪ VACCINE
+    --   TÍNH TỔNG TIỀN TỪ VACCINE
     DECLARE @TongTienVaccine DECIMAL(18,2);
     
     SELECT @TongTienVaccine = ISNULL(SUM(ThanhTien), 0)
@@ -577,10 +577,10 @@ BEGIN
         -- A. Update trạng thái phiếu
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DHT',         -- Đã hoàn tất (Chờ thanh toán)
-            TG_ThucHienDV = GETDATE()  -- 🔥 GHI ĐÈ = thời gian hoàn thành tiêm
+            TG_ThucHienDV = GETDATE()  --   GHI ĐÈ = thời gian hoàn thành tiêm
         WHERE MaPhieu = @MaPhieu;
         
-        -- 🔥 KHÔNG CẬP NHẬT HÓA ĐƠN NỮA!
+        --   KHÔNG CẬP NHẬT HÓA ĐƠN NỮA!
         -- Hóa đơn sẽ được TẠO MỚI khi nhân viên xuất hóa đơn
         
         COMMIT TRANSACTION;
@@ -751,25 +751,25 @@ BEGIN
         RTRIM(ISNULL(P.TrangThai, 'DD')) AS TrangThai,
         KH.SDT,
         HTT.DiaChiGiaoHang AS DiaChi,
-        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, -- 🔥 LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
+        ISNULL(HTT.TongThanhTien, HDTT.TongThanhTienSC) AS TongThanhTien, --   LẤY TỪ HD_TRUC_TUYEN HOẶC HD_TRUC_TIEP
         HTT.MaPhieu AS MaHD,  -- Để biết có HD_TRUC_TUYEN không
-        HDTT.PhuongThucTT AS PhuongThucTT, -- 🔥 LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
-        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, -- 🔥 MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
-        RTRIM(P.MaNV) AS MaNV_BacSi, -- 🔥 MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
-        U_BacSi.HoTen AS TenBacSi -- 🔥 LẤY TÊN BÁC SĨ ĐÃ GÁN
+        HDTT.PhuongThucTT AS PhuongThucTT, --   LẤY PHƯƠNG THỨC THANH TOÁN ĐỂ BIẾT ĐÃ XUẤT HÓA ĐƠN CHƯA
+        RTRIM(HDTT.MaNV) AS MaNV_XuatHD, --   MÃ NHÂN VIÊN XUẤT HÓA ĐƠN (từ HD_TRUC_TIEP)
+        RTRIM(P.MaNV) AS MaNV_BacSi, --   MÃ BÁC SĨ (từ PHIEU_DICH_VU) - đổi tên để phân biệt
+        U_BacSi.HoTen AS TenBacSi --   LẤY TÊN BÁC SĨ ĐÃ GÁN
     FROM PHIEU_DICH_VU P
     JOIN KHACH_HANG KH ON P.MaKH = KH.MaKH
     JOIN [USER] U ON KH.MaKH = U.MaUser
-    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser -- 🔥 JOIN ĐỂ LẤY TÊN BÁC SĨ
+    LEFT JOIN [USER] U_BacSi ON P.MaNV = U_BacSi.MaUser --   JOIN ĐỂ LẤY TÊN BÁC SĨ
     LEFT JOIN PHIEU_KHAM_BENH PKB ON P.MaPhieu = PKB.MaPhieu
     LEFT JOIN PHIEU_TIEM_VACCINE PTV ON P.MaPhieu = PTV.MaPhieu
     LEFT JOIN THU_CUNG TC ON ISNULL(PKB.MaTC, PTV.MaTC) = TC.MaTC
     LEFT JOIN HD_TRUC_TUYEN HTT ON P.MaPhieu = HTT.MaPhieu
-    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu -- 🔥 JOIN ĐỂ LẤY PHƯƠNG THỨC TT
+    LEFT JOIN HD_TRUC_TIEP HDTT ON P.MaPhieu = HDTT.MaPhieu --   JOIN ĐỂ LẤY PHƯƠNG THỨC TT
     WHERE P.MaCN = @MaCN 
       AND (@TrangThai IS NULL OR RTRIM(P.TrangThai) = @TrangThai)
       AND (
-          -- 🔥 LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
+          --   LOGIC MỚI: Hiện đơn nếu thỏa 1 trong 2:
           -- 1. Ngày ĐẶT nằm trong khoảng (đơn mới đặt cần xử lý)
           -- 2. Ngày MUỐN NHẬN nằm trong khoảng (đơn đến hạn giao)
           CAST(P.TG_LapPhieu AS DATE) BETWEEN @TuNgay AND @DenNgay
@@ -829,14 +829,14 @@ BEGIN
 
     SELECT 
         NV.MaNV,
-        U.HoTen AS TenNV, -- 🔥 Đổi tên cho đúng với frontend
+        U.HoTen AS TenNV, --   Đổi tên cho đúng với frontend
         
         -- Đếm xem ổng đang ôm bao nhiêu ca 'DTH' (Đang thực hiện)
         (SELECT COUNT(*) 
          FROM PHIEU_DICH_VU P 
          WHERE P.MaNV = NV.MaNV AND P.TrangThai = 'DTH') AS SoCaDangKham,
          
-        -- 🔥 Đánh dấu trạng thái: "Rảnh" hoặc "Bận"
+        --   Đánh dấu trạng thái: "Rảnh" hoặc "Bận"
         CASE 
             WHEN (SELECT COUNT(*) FROM PHIEU_DICH_VU P WHERE P.MaNV = NV.MaNV AND P.TrangThai = 'DTH') > 0 
             THEN N'Bận'
@@ -1046,3 +1046,4 @@ BEGIN
 END;
 
 GO
+
