@@ -1,7 +1,7 @@
 /*
 ===============================================
 FILE: 2_NHAN_VIEN_TU_VAN_BAC_SI.sql
-Phân hệ: NHÂN VIÊN TƯ VẤN & BÁC SĨ
+Phân hệ: BÁC SĨ
 ===============================================
 
 MỤC ĐÍCH:
@@ -1044,4 +1044,5 @@ BEGIN
     WHERE PTV.MaTC = @MaTC
     ORDER BY PDV.TG_ThucHienDV DESC;
 END;
+
 GO
