@@ -1136,8 +1136,8 @@ GO
 SET QUOTED_IDENTIFIER OFF
 GO
 
--- 8. Cáº­p nháº­t thÃ´ng tin nhÃ¢n viÃªn
-CREATE   PROC [dbo].[sp_CapNhatNhanVien]
+-- 8. Cập nhật thông tin nhân viên
+CREATE OR ALTER PROC [dbo].[sp_CapNhatNhanVien]
     @MaNV NCHAR(10),
     @HoTen NVARCHAR(50) = NULL,
     @NgaySinh DATE = NULL,
@@ -1147,33 +1147,35 @@ CREATE   PROC [dbo].[sp_CapNhatNhanVien]
 AS
 BEGIN
     SET NOCOUNT ON;
+    SET XACT_ABORT ON; -- Tự động rollback nếu có lỗi nghiêm trọng
 
+    -- Kiểm tra nhân viên có tồn tại hay không
     IF NOT EXISTS (SELECT 1 FROM NHAN_VIEN WHERE MaNV = @MaNV)
     BEGIN
-        RAISERROR(N'NhÃ¢n viÃªn khÃ´ng tá»“n táº¡i!', 16, 1);
+        RAISERROR(N'Nhân viên không tồn tại!', 16, 1);
         RETURN;
     END
 
     BEGIN TRANSACTION;
     BEGIN TRY
-        -- Update báº£ng USER
+        -- Cập nhật bảng USER
         UPDATE [USER]
         SET HoTen = ISNULL(@HoTen, HoTen),
             NgaySinh = ISNULL(@NgaySinh, NgaySinh),
             GioiTinh = ISNULL(@GioiTinh, GioiTinh)
         WHERE MaUser = @MaNV;
 
-        -- Update báº£ng NHAN_VIEN
+        -- Cập nhật bảng NHAN_VIEN
         UPDATE NHAN_VIEN
         SET ChucVu = ISNULL(@ChucVu, ChucVu),
             LuongCoBan = ISNULL(@LuongCoBan, LuongCoBan)
         WHERE MaNV = @MaNV;
 
         COMMIT TRANSACTION;
-        PRINT N'Cáº­p nháº­t thÃ nh cÃ´ng!';
+        PRINT N'Cập nhật thành công!';
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         DECLARE @Err NVARCHAR(2000) = ERROR_MESSAGE();
         RAISERROR(@Err, 16, 1);
     END CATCH
@@ -3556,8 +3558,8 @@ GO
 SET QUOTED_IDENTIFIER OFF
 GO
 
--- 7. ThÃªm nhÃ¢n viÃªn má»›i
-CREATE   PROC [dbo].[sp_ThemNhanVien]
+-- 7. Thêm nhân viên mới
+CREATE OR ALTER PROC [dbo].[sp_ThemNhanVien]
     @HoTen NVARCHAR(50),
     @NgaySinh DATE,
     @GioiTinh NVARCHAR(3),
@@ -3572,26 +3574,26 @@ BEGIN
     SET NOCOUNT ON;
     SET XACT_ABORT ON;
 
-    -- Validation
+    -- Kiểm tra (Validation)
     IF EXISTS (SELECT 1 FROM TAI_KHOAN WHERE TenDangNhap = @TenDangNhap)
     BEGIN
-        RAISERROR(N'TÃªn Ä‘Äƒng nháº­p Ä‘Ã£ tá»“n táº¡i!', 16, 1);
+        RAISERROR(N'Tên đăng nhập đã tồn tại!', 16, 1);
         RETURN;
     END
 
     IF @NgaySinh >= GETDATE()
     BEGIN
-        RAISERROR(N'NgÃ y sinh khÃ´ng há»£p lá»‡!', 16, 1);
+        RAISERROR(N'Ngày sinh không hợp lệ!', 16, 1);
         RETURN;
     END
 
     IF @LuongCoBan <= 0
     BEGIN
-        RAISERROR(N'LÆ°Æ¡ng cÆ¡ báº£n pháº£i lá»›n hÆ¡n 0!', 16, 1);
+        RAISERROR(N'Lương cơ bản phải lớn hơn 0!', 16, 1);
         RETURN;
     END
 
-    -- Sinh mÃ£ nhÃ¢n viÃªn tá»± Ä‘á»™ng
+    -- Sinh mã nhân viên tự động
     DECLARE @MaNV NCHAR(10);
     DECLARE @MaxID INT;
     
@@ -3610,28 +3612,28 @@ BEGIN
 
     BEGIN TRANSACTION;
     BEGIN TRY
-        -- Insert vÃ o báº£ng USER
+        -- Insert vào bảng USER
         INSERT INTO [USER] (MaUser, HoTen, NgaySinh, GioiTinh, LoaiUser)
         VALUES (@MaNV, @HoTen, @NgaySinh, @GioiTinh, 'NV');
 
-        -- Insert vÃ o báº£ng NHAN_VIEN
+        -- Insert vào bảng NHAN_VIEN
         INSERT INTO NHAN_VIEN (MaNV, NgayVaoLam, LuongCoBan, ChucVu, MaCN)
         VALUES (@MaNV, @NgayVaoLam, @LuongCoBan, @ChucVu, @MaCN);
 
-        -- Insert vÃ o báº£ng TAI_KHOAN
+        -- Insert vào bảng TAI_KHOAN
         INSERT INTO TAI_KHOAN (TenDangNhap, MatKhau, MaUser)
         VALUES (@TenDangNhap, @MatKhau, @MaNV);
 
-        -- Táº¡o há»“ sÆ¡ phÃ¢n cÃ´ng
+        -- Tạo hồ sơ phân công
         INSERT INTO PHAN_CONG_CN (MaCN, MaNV, NgayBD, NgayKT, Ghichu)
-        VALUES (@MaCN, @MaNV, @NgayVaoLam, '9999-12-31', N'PhÃ¢n cÃ´ng ban Ä‘áº§u');
+        VALUES (@MaCN, @MaNV, @NgayVaoLam, '9999-12-31', N'Phân công ban đầu');
 
         COMMIT TRANSACTION;
         
         SELECT @MaNV AS MaNVMoi;
     END TRY
     BEGIN CATCH
-        ROLLBACK TRANSACTION;
+        IF @@TRANCOUNT > 0 ROLLBACK TRANSACTION;
         DECLARE @Err NVARCHAR(2000) = ERROR_MESSAGE();
         RAISERROR(@Err, 16, 1);
     END CATCH
@@ -5941,5 +5943,6 @@ BEGIN
     ORDER BY TongDoanhThu DESC;
 END;
 GO
+
 
 
