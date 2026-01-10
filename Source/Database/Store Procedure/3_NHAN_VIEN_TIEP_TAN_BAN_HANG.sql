@@ -136,7 +136,7 @@ BEGIN
         UPDATE PHIEU_DICH_VU
         SET TrangThai = 'DTH',             -- Chuyển sang Đang thực hiện
             MaNV = @MaNV_PhuTrach,         -- Gán nhân viên phụ trách
-            TG_ThucHienDV = GETDATE()      -- 🔥 GHI ĐÈ = thời gian check-in thực tế
+            TG_ThucHienDV = GETDATE()      --   GHI ĐÈ = thời gian check-in thực tế
         WHERE MaPhieu = @MaPhieu;
 
         -- 2.2 Tạo Hóa Đơn Trực Tiếp
@@ -819,14 +819,14 @@ BEGIN
     BEGIN TRANSACTION;  
     BEGIN TRY  
           
-        -- 🔥 THÊM MaNV = @MaNV_XuatHD VÀO ĐÂY
+        --   THÊM MaNV = @MaNV_XuatHD VÀO ĐÂY
         UPDATE HD_TRUC_TIEP  
         SET TongThanhTien = @TongTienHang,
             KhuyenMai = @TongKhuyenMai,  
             DiemQuyDoi = @DiemMuonDung,  
             TongThanhTienSC = @TongThanhToan,  
             PhuongThucTT = @PhuongThucTT,
-            MaNV = @MaNV_XuatHD  -- 🔥 DÒNG NÀY
+            MaNV = @MaNV_XuatHD  --  DÒNG NÀY
         WHERE MaPhieu = @MaPhieu;  
 
         IF @DiemMuonDung > 0  
@@ -916,7 +916,7 @@ BEGIN
         MH.LoaiMH,
         MH.DonGia,
 
-        -- 🔥 ĐÃ CHÈN THÊM TÍNH ĐIỂM Ở ĐÂY 🔥
+        --   ĐÃ CHÈN THÊM TÍNH ĐIỂM Ở ĐÂY  
         ISNULL((SELECT AVG(CAST(DiemChatLuong AS FLOAT)) 
                 FROM DANH_GIA_SP 
                 WHERE MaMatHang = MH.MaMatHang), 0) AS DiemTrungBinh,
@@ -924,7 +924,7 @@ BEGIN
         (SELECT COUNT(*) 
          FROM DANH_GIA_SP 
          WHERE MaMatHang = MH.MaMatHang) AS SoLuongDanhGia,
-        -- 🔥 KẾT THÚC ĐOẠN CHÈN 🔥
+        --   KẾT THÚC ĐOẠN CHÈN  
 
         CASE 
             WHEN SUM(TK.SoLuongTon) > 0 THEN N'Còn hàng'
@@ -934,7 +934,7 @@ BEGIN
     LEFT JOIN TON_KHO TK 
         ON MH.MaMatHang = TK.MaMatHang
 
-    -- ✅ Join bảng THUOC (con của MAT_HANG)
+    --    Join bảng THUOC (con của MAT_HANG)
     LEFT JOIN THUOC T
         ON T.MaThuoc = MH.MaMatHang   
 
@@ -942,10 +942,10 @@ BEGIN
         (@TuKhoa IS NULL OR MH.TenMatHang LIKE N'%' + @TuKhoa + N'%')
         AND (@LoaiMH IS NULL OR MH.LoaiMH = @LoaiMH)
 
-        -- ✅ 1) Vaccine không bán lẻ online
+        --    1) Vaccine không bán lẻ online
         AND MH.LoaiMH <> 'VC'
 
-        -- ✅ 2) Thuốc chỉ bán "Không cần kê đơn"
+        --    2) Thuốc chỉ bán "Không cần kê đơn"
         AND (
             MH.LoaiMH <> 'T'
             OR (MH.LoaiMH = 'T' AND ISNULL(T.LoaiThuoc, N'') = N'Không cần kê đơn')
@@ -1000,7 +1000,7 @@ BEGIN
         MH.LoaiMH,
         MH.DonGia,
 
-        -- 🔥 ĐÃ CHÈN THÊM ĐOẠN TÍNH ĐIỂM Ở ĐÂY 🔥
+        --   ĐÃ CHÈN THÊM ĐOẠN TÍNH ĐIỂM Ở ĐÂY  
         ISNULL((SELECT AVG(CAST(DiemChatLuong AS FLOAT)) 
                 FROM DANH_GIA_SP 
                 WHERE MaMatHang = MH.MaMatHang), 0) AS DiemTrungBinh,
@@ -1008,7 +1008,7 @@ BEGIN
         (SELECT COUNT(*) 
          FROM DANH_GIA_SP 
          WHERE MaMatHang = MH.MaMatHang) AS SoLuongDanhGia,
-        -- 🔥 KẾT THÚC ĐOẠN CHÈN 🔥
+        --   KẾT THÚC ĐOẠN CHÈN  
 
         ISNULL(TK.SoLuongTon, 0) AS SoLuongTon,
         CASE 
@@ -1017,12 +1017,12 @@ BEGIN
         END AS TinhTrang
     FROM MAT_HANG MH
 
-    -- ✅ tồn kho đúng CHI NHÁNH
+    --  tồn kho đúng CHI NHÁNH
     LEFT JOIN TON_KHO TK
         ON TK.MaMatHang = MH.MaMatHang
        AND TK.MaCN = @MaCN
 
-    -- ✅ bảng THUOC (con)
+    --    bảng THUOC (con)
     LEFT JOIN THUOC T
         ON T.MaThuoc = MH.MaMatHang   -- nếu khác thì đổi thành T.MaMatHang = MH.MaMatHang
 
@@ -1030,10 +1030,10 @@ BEGIN
         (@TuKhoa IS NULL OR MH.TenMatHang LIKE N'%' + @TuKhoa + N'%')
         AND (@LoaiMH IS NULL OR MH.LoaiMH = @LoaiMH)
 
-        -- ✅ 1) Vaccine không bán lẻ online
+        --    1) Vaccine không bán lẻ online
         AND MH.LoaiMH <> 'VC'
 
-        -- ✅ 2) Thuốc: chỉ OTC
+        --    2) Thuốc: chỉ OTC
         AND (
             MH.LoaiMH <> 'T'
             OR (MH.LoaiMH = 'T' AND ISNULL(T.LoaiThuoc, N'') = N'Không cần kê đơn')
@@ -1238,7 +1238,7 @@ END;
 GO
 
 CREATE OR ALTER PROC sp_CapNhatDiemSauKhiGiaoHang
-    @MaPhieu NCHAR(10)  -- 🔥 Nhận MaPhieu chứ không phải MaHD
+    @MaPhieu NCHAR(10)  --   Nhận MaPhieu chứ không phải MaHD
 AS
 BEGIN
     SET NOCOUNT ON;
@@ -1251,7 +1251,7 @@ BEGIN
     -- 1. Lấy thông tin khách hàng và tổng tiền từ hóa đơn trực tuyến
     SELECT 
         @MaKH = P.MaKH,
-        @TongTien = H.TongThanhTienSC  -- 🔥 Sau khi trừ điểm, ship, khuyến mãi
+        @TongTien = H.TongThanhTienSC  --   Sau khi trừ điểm, ship, khuyến mãi
     FROM HD_TRUC_TUYEN H
     JOIN PHIEU_DICH_VU P ON H.MaPhieu = P.MaPhieu
     WHERE LTRIM(RTRIM(H.MaPhieu)) = LTRIM(RTRIM(@MaPhieu));
@@ -1282,5 +1282,6 @@ BEGIN
         N'Đã cộng ' + CAST(@DiemCong AS NVARCHAR(10)) + N' điểm cho khách hàng!' AS Message;
 END;
 GO
+
 
 
