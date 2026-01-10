@@ -21,7 +21,7 @@ CHỨC NĂNG CHI TIẾT:
 6. Tra cứu: Sản phẩm, Theo chi nhánh
 
 
-TỔNG SỐ SP: 14
+TỔNG SỐ SP: 15
 
 ===============================================
 DANH SÁCH STORED PROCEDURES:
@@ -55,7 +55,7 @@ DANH SÁCH STORED PROCEDURES:
 -- 7. QUẢN LÝ HÀNG HÓA
 -- sp_ThemMatHang                  : Thêm mặt hàng mới vào kho
 -- sp_CapNhatTrangThaiDonHang      : Cập nhật trạng thái đơn hàng
-
+-- sp_CapNhatDiemSauKhiGiaoHang
 
 USE HAPPYPET
 GO
@@ -1235,5 +1235,51 @@ BEGIN
     END CATCH
 END;
 
+GO
+
+CREATE OR ALTER PROC sp_CapNhatDiemSauKhiGiaoHang
+    @MaPhieu NCHAR(10)  -- 🔥 Nhận MaPhieu chứ không phải MaHD
+AS
+BEGIN
+    SET NOCOUNT ON;
+    
+    DECLARE @MaKH NCHAR(10);
+    DECLARE @TongTien DECIMAL(18, 2);
+    DECLARE @DiemCong INT;
+    DECLARE @DiemHienTai INT;
+    
+    -- 1. Lấy thông tin khách hàng và tổng tiền từ hóa đơn trực tuyến
+    SELECT 
+        @MaKH = P.MaKH,
+        @TongTien = H.TongThanhTienSC  -- 🔥 Sau khi trừ điểm, ship, khuyến mãi
+    FROM HD_TRUC_TUYEN H
+    JOIN PHIEU_DICH_VU P ON H.MaPhieu = P.MaPhieu
+    WHERE LTRIM(RTRIM(H.MaPhieu)) = LTRIM(RTRIM(@MaPhieu));
+    
+    IF @MaKH IS NULL
+    BEGIN
+        RAISERROR(N'Không tìm thấy khách hàng cho hóa đơn này!', 16, 1);
+        RETURN;
+    END
+    
+    -- 2. Tính điểm được cộng (1 điểm = 50.000đ)
+    SET @DiemCong = FLOOR(@TongTien / 50000);
+    
+    -- 3. Cộng điểm vào tài khoản khách hàng
+    UPDATE KHACH_HANG
+    SET TongDiemTichLuy = ISNULL(TongDiemTichLuy, 0) + @DiemCong
+    WHERE MaKH = @MaKH;
+    
+    -- 4. Lấy điểm sau khi cộng
+    SELECT @DiemHienTai = TongDiemTichLuy FROM KHACH_HANG WHERE MaKH = @MaKH;
+    
+    -- 5. Trả về thông báo
+    SELECT 
+        @MaKH AS MaKhachHang,
+        @TongTien AS TongTienDonHang,
+        @DiemCong AS DiemDuocCong,
+        @DiemHienTai AS DiemConLai,
+        N'Đã cộng ' + CAST(@DiemCong AS NVARCHAR(10)) + N' điểm cho khách hàng!' AS Message;
+END;
 GO
 
