@@ -418,7 +418,7 @@ WHERE TrangThai = 'DH'
 -- Update sản phẩm -- 
 update MAT_HANG
 set TenMatHang = N'Áo mùa hè 3 lỗ cho chó'
-where MaMatHang = 'MH0616    '
+where MaMatHang = 'MH0616'
 
 UPDATE MAT_HANG
 SET TenMatHang = REPLACE(TenMatHang, N'Lông Thỏ', N'Lông Mềm')
