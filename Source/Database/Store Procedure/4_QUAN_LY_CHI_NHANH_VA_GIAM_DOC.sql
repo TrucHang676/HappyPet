@@ -17,11 +17,11 @@ CHỨC NĂNG CHI TIẾT:
 2. Kho: Nhập hàng, Quản lý tồn kho
 3. Doanh thu: Thống kê, Báo cáo theo dot, theo sản phẩm
 4. Xếp hạng: Xếp hạng hội viên, Cập nhật xếp hạng
-5. Thống kê: Nhân viên giỏi, Khách hàng lâu chưa quay lại, Pet được tiêm
+5. Thống kê: Nhân viên giỏi, Khách hàng lâu chưa quay lại, Pet được tiêm, Số lượt khám theo thời gian, thống kê doanh thu sản phẩm, thống kê doanh thu theo bác sĩ.
 6. Lịch sử: Hoạt động, Đặt lịch
 7. Danh sách: Chi nhánh, Lịch bác sĩ
 
-TỔNG SỐ SP: 24
+TỔNG SỐ SP: 27
 
 ===============================================
 DANH SÁCH STORED PROCEDURES:
@@ -46,6 +46,9 @@ DANH SÁCH STORED PROCEDURES:
 -- sp_ThongKeHoiVien               : Thống kê hội viên
 -- sp_ThongKeKhachHangLauChuaQuayLai : Khách hàng lâu chưa quay lại
 -- sp_CapNhatXepHangHoiVien        : Cập nhật xếp hạng hội viên
+-- sp_ThongKeSoLuotKham
+-- sp_ThongKeDoanhThuBanHang
+-- sp_ThongKeDoanhThuBacSi
 
 -- 5. PET & VACCINE
 -- sp_ThongKePetDuocTiem           : Thống kê pet được tiêm
@@ -1020,3 +1023,4 @@ BEGIN
 END;
 
 GO
+
