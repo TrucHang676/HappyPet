@@ -1,0 +1,15 @@
+﻿USE HAPPYPET
+GO
+
+-- Bảng XEP_HANG_NAM
+-- B1: Tạo Function chia theo các năm (Kiểu INT)
+CREATE PARTITION FUNCTION PF_Xep_Hang_Nam (int)
+AS RANGE RIGHT 
+FOR VALUES (2023, 2024, 2025, 2026);
+GO
+
+-- B2: Tạo Scheme
+CREATE PARTITION SCHEME PS_Xep_Hang_Nam
+AS PARTITION PF_Xep_Hang_Nam
+ALL TO ([PRIMARY]);
+GO
