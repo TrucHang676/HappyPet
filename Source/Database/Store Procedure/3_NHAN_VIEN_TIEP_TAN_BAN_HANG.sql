@@ -797,14 +797,14 @@ BEGIN
 
     SET @TongTienHang = @TongTienHang + @TienDichVuCoBan;  
 
+    DECLARE @NamTruoc INT = YEAR(GETDATE()) - 1;
     DECLARE @PhanTramGiam INT = 0;  
     DECLARE @TienGiamHangTV DECIMAL(18,2) = 0;  
 
-    SELECT TOP 1 @PhanTramGiam = HTV.KhuyenMaiUuTien  
+    SELECT @PhanTramGiam = HTV.KhuyenMaiUuTien  
     FROM XEP_HANG_NAM XHN  
     JOIN HANG_TV HTV ON XHN.MaHang = HTV.MaHang  
-    WHERE XHN.MaKH = @MaKH  
-    ORDER BY XHN.Nam DESC;
+    WHERE XHN.MaKH = @MaKH AND XHN.Nam = @NamTruoc;
 
     SET @TienGiamHangTV = @TongTienHang * (ISNULL(@PhanTramGiam, 0) / 100.0);  
 
@@ -1282,4 +1282,5 @@ BEGIN
         N'Đã cộng ' + CAST(@DiemCong AS NVARCHAR(10)) + N' điểm cho khách hàng!' AS Message;
 END;
 GO
+
 
