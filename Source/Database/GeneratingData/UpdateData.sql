@@ -523,7 +523,7 @@ BEGIN TRANSACTION;
         @Nam, 
         MaHangMoi, 
         TongTienNamNay, 
-        GETDATE()
+        '2025-12-31'
     FROM @BangXepHangMoi;
 
     PRINT N'Đã thêm ' + CAST(@@ROWCOUNT AS NVARCHAR(10)) + N' bản ghi xếp hạng mới';
