@@ -1,8 +1,5 @@
 ﻿USE HAPPYPET
 GO
-
-DBCC FREEPROCCACHE; -- Xóa cache thực thi
-DBCC DROPCLEANBUFFERS; -- Xóa cache dữ liệu trên RAM
 -- =================================================================================
 -- TV1: Tra cứu danh sách thú cưng đến hẹn tái khám
 -- =================================================================================
@@ -16,10 +13,6 @@ CREATE NONCLUSTERED INDEX IX_PHIEU_DICH_VU_MaCN_T1
 ON [dbo].[PHIEU_DICH_VU] ([MaCN])
 INCLUDE ([MaPhieu]); 
 GO
-
-DROP INDEX IX_PHIEU_KHAM_BENH_NgayHen_T1 ON dbo.PHIEU_KHAM_BENH;
-DROP INDEX IX_PHIEU_DICH_VU_MaCN_T1 ON dbo.PHIEU_DICH_VU;
-
 -- =================================================================================
 -- TV2: Tra cứu sản phẩm (theo Tên/Loại) của một chi nhánh
 -- =================================================================================
@@ -27,10 +20,6 @@ DROP INDEX IX_PHIEU_DICH_VU_MaCN_T1 ON dbo.PHIEU_DICH_VU;
 CREATE NONCLUSTERED INDEX IX_MAT_HANG_LoaiMH_T2
 ON [dbo].[MAT_HANG] ([LoaiMH]) 
 INCLUDE ([TenMatHang], [DonGia]);
-
-DROP INDEX IX_MAT_HANG_LoaiMH_T2 ON MAT_HANG;
-GO
-
 -- =================================================================================
 -- TV3: Tra cứu Phiếu dịch vụ trong ngày của một chi nhánh (Lọc theo Ngày & Mã CN)
 -- =================================================================================
@@ -39,9 +28,6 @@ CREATE NONCLUSTERED INDEX IX_PHIEU_DICH_VU_MaCN_Ngay_T3
 ON [dbo].[PHIEU_DICH_VU] ([MaCN], [TG_ThucHienDV])
 INCLUDE ([TrangThai], [LoaiPhieu], [MaNV], [MaKH]);
 GO
-
-DROP INDEX IX_PHIEU_DICH_VU_MaCN_Ngay_T3 ON PHIEU_DICH_VU;
-
 -- =================================================================================
 -- TV7: Xem lịch sử khám bệnh của một thú cưng
 -- =================================================================================
@@ -55,10 +41,6 @@ CREATE NONCLUSTERED INDEX IX_CT_DON_THUOC_MaPhieu_T7
 ON [dbo].[CT_DON_THUOC] ([MaPhieu])
 INCLUDE ([MaThuoc], [SoLuong], [LieuLuong]);
 GO
-
-DROP INDEX IX_PHIEU_KHAM_BENH_MaTC_T7 ON PHIEU_KHAM_BENH;
-DROP INDEX IX_CT_DON_THUOC_MaPhieu_T7 ON CT_DON_THUOC;
-
 -- =================================================================================
 -- TV8: Xem lịch sử tiêm phòng của một thú cưng
 -- =================================================================================
@@ -75,7 +57,3 @@ GO
 CREATE NONCLUSTERED INDEX IX_PHIEU_TIEM_VACCINE_MaPhieu_T8
 ON [dbo].[PHIEU_TIEM_VACCINE] ([MaPhieu]);
 GO
-
-DROP INDEX IX_PHIEU_TIEM_VACCINE_MaTC_T8 ON PHIEU_TIEM_VACCINE;
-DROP INDEX IX_CT_TIEM_VC_MaPhieu_T8 ON CT_TIEM_VC;
-DROP INDEX IX_PHIEU_TIEM_VACCINE_MaPhieu_T8 ON PHIEU_TIEM_VACCINE;
