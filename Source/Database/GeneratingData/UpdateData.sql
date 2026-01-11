@@ -431,11 +431,6 @@ WHERE TenMatHang LIKE N'%Lông%'
 update MAT_HANG
 set TenMatHang = N'Áo hình con chó nhỏ'
 where MaMatHang = 'MH1934'
-
-
-USE HAPPYPET
-GO
-
 -- CẬP NHẬT XẾP HẠNG HỘI VIÊN NĂM 2026 (BỎ CHECK NGÀY 31/12)
 -- Chạy script này để update xếp hạng cho khách hàng năm 2026
 
